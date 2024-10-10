@@ -1,4 +1,4 @@
-class Graph_prim:
+class Graph_kruskal:
     def __init__(self, graph_matrix, chromosome, k, input_data_type='gm'):
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
@@ -45,22 +45,16 @@ class Graph_prim:
                 return False
         return True
 
-    def prim(self):
-        start_vertex = self.chromosome[len(self.chromosome) - 1]
-        edges = self.get_edges()
-        edges.sort(reverse=True)
-        MST = []
-        nodes_visited = [start_vertex]
-        actual_edge = self.get_cheapest_edge(start_vertex, edges)
-        MST.append(actual_edge)
-        nodes_visited.append(actual_edge[2])
-        edges.remove(actual_edge)
+    def kruskal(self):
 
-        while len(nodes_visited) < (len(self.graph_matrix)):
+        edges = self.get_edges()
+        edges.sort(key=lambda x: x[0])
+        MST = []
+        nodes_visited = [edges.pop()]
+        while len(MST) < (len(self.graph_matrix[0])-1):
             actual_edge = edges.pop()
-            if self.is_valid(actual_edge, MST, nodes_visited):
-                MST.append(actual_edge)
-                nodes_visited.append(actual_edge[2])
+
+
         return MST
 
 # graph_matrix = [[0,4,3,9],
