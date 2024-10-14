@@ -18,7 +18,7 @@ decimals = 3
 tournament_size = 0.2
 
 
-def fitness_fn(sample, graph_matrix_ft):
+def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
     graph = prim.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
     mst = graph.prim()
     real_cost = 0
@@ -26,6 +26,13 @@ def fitness_fn(sample, graph_matrix_ft):
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
     return real_cost
 
+def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
+    graph = prim.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
+    mst = graph.prim()
+    real_cost = 0
+    for edge in mst:
+        real_cost += graph_matrix_ft[edge[1]][edge[2]]
+    return real_cost
 
 #############################
 
@@ -146,6 +153,6 @@ chromosome0 = [1, 1, 1, 1, 0]
 
 #print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn, prueba1,ngen=100))
+print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=100))
 prueba = lectorTSP.read_matrix("fri26.tsp")
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn, prueba,ngen=400))

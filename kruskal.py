@@ -49,19 +49,21 @@ class Graph_kruskal:
 
         edges = self.get_edges()
         edges.sort(key=lambda x: x[0])
-        MST = []
-        nodes_visited = [edges.pop()]
+        MST = [edges.pop()]
+        nodes_visited = [MST[0][1], MST[0][2]]
         while len(MST) < (len(self.graph_matrix[0])-1):
             actual_edge = edges.pop()
-
+            if self.is_valid(actual_edge, MST, nodes_visited):
+                MST.append(actual_edge)
+                nodes_visited.append(actual_edge[2])
 
         return MST
 
-# graph_matrix = [[0,4,3,9],
-#                 [4,0,8,10],
-#                  [3,8,1,1],
-#                   [9,10,1,0]]
-#
-# graph = Graph(graph_matrix,[3,4,5,1,0], 2)
-# print(graph.prim(0))
-# [(3, 0, 2), (1, 2, 3), (3, 0, 2)]
+graph_matrix = [[0,3,1,0],
+                [3,0,2,4],
+                [1,2,0,5],
+                  [0,4,5,0]]
+
+graph = Graph_kruskal(graph_matrix,[3,4,5,1,0], 2)
+print(graph.kruskal())
+
