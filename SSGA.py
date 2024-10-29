@@ -1,11 +1,12 @@
 import prim
+import kruskal as kr
 import numpy as np
-import  lectorTSP
+import lectorTSP
 
 prueba1 = [[0, 4, 3, 9],
-                [4, 0, 8, 10],
-                [3, 8, 1, 1],
-                [9, 10, 1, 0]]
+           [4, 0, 8, 10],
+           [3, 8, 1, 1],
+           [9, 10, 1, 0]]
 prueba2 = [0,
            64, 0,
            378, 318, 0,
@@ -26,17 +27,19 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
     return real_cost
 
+
 def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
-    graph = prim.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
-    mst = graph.prim()
+    graph = kr.Graph_kruskal(graph_matrix_ft, sample, k, input_data_type='gm')
+    mst = graph.kruskal()
     real_cost = 0
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
     return real_cost
 
+
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn,graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
@@ -74,7 +77,10 @@ def mutate(x, pmut):
     i = np.random.randint(0, (len(x) - 2))
     x[i] = 1
     return x
+
+
 1
+
 
 def uniform_crossover(x, y):
     probability_vector = np.random.randint(2, size=len(x))
@@ -94,10 +100,10 @@ def get_number_distribution(i, j):
 
 
 def init_population(pop_number, graph_size):
-    array = np.fromfunction(np.vectorize(get_number_distribution), (pop_number, graph_size+1), dtype=float)
+    array = np.fromfunction(np.vectorize(get_number_distribution), (pop_number, graph_size + 1), dtype=float)
     population = []
 
-    control_gene = [0] * (graph_size+1)
+    control_gene = [0] * (graph_size + 1)
     control_gene = list(map(lambda i: i + 1, control_gene))
     control_gene[len(control_gene) - 1] = 0
     population.append(control_gene)
@@ -133,7 +139,7 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     i = 0
     j = 0
     while i < number_of_competitors and j < 10:
-        competitor = population[np.random.randint(start_point_window, window_size+start_point_window)]
+        competitor = population[np.random.randint(start_point_window, window_size + start_point_window)]
         j += 1
         if not (competitor in competitors):
             i += 1
@@ -151,8 +157,10 @@ chromosome5 = [23, 15, 2, 4, 1]
 chromosome6 = [3, 10, 11, 9, 3]
 chromosome0 = [1, 1, 1, 1, 0]
 
-#print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
+# print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=100))
+# print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
+print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1,
+                                 ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-#print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn, prueba,ngen=400))
+# print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn, prueba,ngen=400))
