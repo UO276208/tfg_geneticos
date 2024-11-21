@@ -1,5 +1,5 @@
-import prim
-import kruskal as kr
+import prim_sin_restriciones as pr
+import kruskal_sin_restricciones as kr
 import numpy as np
 import lectorTSP
 
@@ -13,39 +13,73 @@ prueba2 = [0,
            519, 455, 170, 0,
            434, 375, 265, 223, 0,
            200, 164, 344, 428, 273, 0]
-k = 2
+k = 1
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
+penalty_coefficient = 0.1
 
-
-def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
-    graph = prim.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
-    mst = graph.prim()
+#Variable global que guarde el coheficiente de penalizacion
+#Cada 10 (por ejemplo) generaciones sacar un vector con los fitness de la poblacion de la generación actual, meterlo en un diccionario
+#de manera que cada individuo sea la clave y su fitness el valor (adjuntar el numero de violaciones de restriccion
+# que lo devuelve prim a la funcion fitness) dividirlo en dos diccionarios, uno con los individuos que no violen ninguna restriccion y otro
+#con el resto para poder sacar el peor de los primeros (los correctos) y el mejor de los malos (lo que violan alguna restriccion)
+#############################
+def fitness_fn_prim_penalty(sample, graph_matrix_ft, ajusting=False):
+    graph = pr.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
+    mst, n_violations = graph.prim()
     real_cost = 0
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
-    return real_cost
+    if ajusting:
+        return real_cost, n_violations
+    else:
+        return real_cost - (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 
-def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
+def fitness_fn_kruskal_penalty(sample, graph_matrix_ft, ajusting=False):
     graph = kr.Graph_kruskal(graph_matrix_ft, sample, k, input_data_type='gm')
-    mst = graph.kruskal()
+    mst, n_violations = graph.kruskal()
     real_cost = 0
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
-    return real_cost
 
+    if ajusting:
+        return real_cost, n_violations
+    else:
+        return real_cost - (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 #############################
+def ajust_penalty_coefficients(population, fitness_fn, graph_matrix):
+    global penalty_coefficient
+    fitness = map(lambda chromosome: fitness_fn(chromosome, graph_matrix, ajusting=True), population)
+    population_fitness = list(fitness)
+    feasibles = []
+    not_feasibles = []
+
+    for pop in population_fitness:
+        if pop[1] == 0:
+            feasibles.append(pop)
+        else:
+            not_feasibles.append(pop)
+
+    if len(not_feasibles) > 0:
+        feasible = sorted(feasibles, key=lambda pop: pop[0], reverse=True)[0]
+        not_feasible = sorted(not_feasibles, key=lambda pop: pop[0])[0]
+
+        penalty_coefficient = (feasible[0]-not_feasible[0])/(-(not_feasible[1])*not_feasible[0])
+
 #############################
 
 def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
+        #En intervalos de tamaño 5% de ngen se recalculan los coeficientes de penalizacion
+        if generation % (ngen*0.05) == 0:
+            ajust_penalty_coefficients(population,fitness_fn, graph_matrix)
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
         best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
-        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
+        print(str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
 
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
@@ -78,6 +112,8 @@ def mutate(x, pmut):
     i = np.random.randint(0, (len(x) - 2))
     x[i] = 1
     return x
+
+
 
 def uniform_crossover(x, y):
     probability_vector = np.random.randint(2, size=len(x))
@@ -156,7 +192,6 @@ chromosome0 = [1, 1, 1, 1, 0]
 
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-#print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
-#print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
+#print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=400))
+print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn_prim_penalty, prueba,ngen=400))

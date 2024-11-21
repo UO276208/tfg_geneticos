@@ -4,13 +4,8 @@ class Graph_prim:
         self.chromosome = chromosome
         self.degree_limit = k
         self.edges_vault = []
-        self.input_data_type = input_data_type
 
     def get_edges(self):
-        if self.input_data_type == 'gm':
-            return self.get_edges_gm()
-
-    def get_edges_gm(self):
         edges = []
 
         for i in range(0, len(self.graph_matrix)):
@@ -23,44 +18,47 @@ class Graph_prim:
         self.edges_vault = list(edges)
         return edges
 
-    def get_cheapest_edge(self, vertex, edges):
-        cheapest = edges[0]
-        for edge in edges:
-            if edge[1] == vertex:
-                if edge[0] < cheapest[0]:
-                    cheapest = edge
-        return cheapest
+    def get_cheapest_edge(self, vertexs, edges):
+        vertexs_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
+        vertexs_filtered.sort()
+        return vertexs_filtered[0]
 
-    def is_valid(self, edge, MST, visited):
+    def is_valid(self, edge, visited):
         if edge[1] in visited and edge[2] in visited:
             return False
-        return self.check_degree_limit(edge, MST)
+        return self.check_degree_limit(edge, visited)
 
-    def check_degree_limit(self, edge, MST):
-        degree = 0
-        for mst_edge in MST:
-            if mst_edge[1] == edge[1] or mst_edge[2] == edge[1]:
-                degree += 1
-            if degree > (self.degree_limit - 1):
-                return False
+    def check_degree_limit(self, edge, visited):
+        degree_u = visited.get(edge[1], 0)
+        degree_v = visited.get(edge[2], 0)
+        if (degree_u + 1) > self.degree_limit or (degree_v + 1) > self.degree_limit:
+            return False
         return True
+
+    def get_the_other_edge(self, nodes_visited, edge):
+        if edge[1] in nodes_visited:
+            return edge[2], edge[1]
+        else:
+            return edge[1], edge[2]
 
     def prim(self):
         start_vertex = self.chromosome[len(self.chromosome) - 1]
         edges = self.get_edges()
-        edges.sort(reverse=True)
         MST = []
-        nodes_visited = [start_vertex]
-        actual_edge = self.get_cheapest_edge(start_vertex, edges)
+        nodes_visited = {start_vertex: 1}
+        actual_edge = self.get_cheapest_edge([start_vertex], edges)
         MST.append(actual_edge)
-        nodes_visited.append(actual_edge[2])
+        nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
         edges.remove(actual_edge)
 
         while len(nodes_visited) < (len(self.graph_matrix)):
-            actual_edge = edges.pop()
-            if self.is_valid(actual_edge, MST, nodes_visited):
+            actual_edge = self.get_cheapest_edge(nodes_visited, edges)
+            edges.remove(actual_edge)
+            if self.is_valid(actual_edge, nodes_visited):
                 MST.append(actual_edge)
-                nodes_visited.append(actual_edge[2])
+                nodes = self.get_the_other_edge(nodes_visited, actual_edge)
+                nodes_visited[nodes[0]] = 1
+                nodes_visited[nodes[1]] += 1
         return MST
 
 # graph_matrix = [[0,4,3,9],
