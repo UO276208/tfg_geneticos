@@ -8,10 +8,6 @@ class Graph_prim:
         self.n_violations = 0
 
     def get_edges(self):
-        if self.input_data_type == 'gm':
-            return self.get_edges_gm()
-
-    def get_edges_gm(self):
         edges = []
 
         for i in range(0, len(self.graph_matrix)):
@@ -42,43 +38,44 @@ class Graph_prim:
         vertexs_filtered.sort()
         return vertexs_filtered[0]
 
-    def is_valid(self, edge, MST, visited):
+    def is_valid(self, edge, visited):
         if edge[1] in visited and edge[2] in visited:
             return False
         else:
-            self.check_degree_limit(edge, MST)
+            self.check_degree_limit(edge, visited)
             return True
 
-    def check_degree_limit(self, edge, MST):
-        degree = 0
-        for mst_edge in MST:
-            if mst_edge[1] == edge[1] or mst_edge[2] == edge[1]:
-                degree += 1
-            if degree > (self.degree_limit):
-                self.n_violations += 1
+    def check_degree_limit(self, edge, visited):
+        degree_u = visited.get(edge[1], 0)
+        degree_v = visited.get(edge[2], 0)
+        if (degree_u + 1) > self.degree_limit:
+            self.n_violations += 1
+        if (degree_v + 1) > self.degree_limit:
+            self.n_violations += 1
+
+    def get_the_other_edge(self, nodes_visited, edge):
+        if edge[1] in nodes_visited:
+            return edge[2], edge[1]
+        else:
+            return edge[1], edge[2]
 
     def prim(self):
         start_vertex = self.chromosome[len(self.chromosome) - 1]
         edges = self.get_edges()
         MST = []
-        nodes_visited = [start_vertex]
+        nodes_visited = {start_vertex: 1}
         actual_edge = self.get_cheapest_edge([start_vertex], edges)
         MST.append(actual_edge)
-        nodes_visited.append(actual_edge[2])
+        nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
         edges.remove(actual_edge)
 
         while len(nodes_visited) < (len(self.graph_matrix)):
             actual_edge = self.get_cheapest_edge(nodes_visited, edges)
             edges.remove(actual_edge)
-            if self.is_valid(actual_edge, MST, nodes_visited):
+            if self.is_valid(actual_edge, nodes_visited):
                 MST.append(actual_edge)
-                nodes_visited.append(actual_edge[2])
-        return MST, self.n_violations
+                nodes = self.get_the_other_edge(nodes_visited, actual_edge)
+                nodes_visited[nodes[0]] = 1
+                nodes_visited[nodes[1]] += 1
 
-graph_matrix = [[0, 4, 3, 9],
-                [4, 0, 8, 10],
-                [3, 8, 1, 1],
-                [9, 10, 1, 0]]
-graph = Graph_prim(graph_matrix,[3,4,5,1,0], 1)
-print(graph.prim())
-# [(3, 0, 2), (1, 2, 3), (3, 0, 2)]
+        return MST, self.n_violations

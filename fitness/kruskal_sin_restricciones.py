@@ -32,39 +32,42 @@ class Graph_kruskal:
                     cheapest = edge
         return cheapest
 
-    def is_valid(self, edge, MST, visited):
+    def is_valid(self, edge, visited):
         if edge[1] in visited and edge[2] in visited:
             return False
         else:
-            self.check_degree_limit(edge, MST)
+            self.check_degree_limit(edge, visited)
             return True
 
-    def check_degree_limit(self, edge, MST):
-        degree = 0
-        for mst_edge in MST:
-            if mst_edge[1] == edge[1] or mst_edge[2] == edge[1]:
-                degree += 1
-            if degree > (self.degree_limit):
-                self.n_violations += 1
-    def kruskal(self):
+    def check_degree_limit(self, edge, visited):
+        degree_u = visited.get(edge[1], 0)
+        degree_v = visited.get(edge[2], 0)
+        if (degree_u + 1) > self.degree_limit:
+            self.n_violations += 1
+        if (degree_v + 1) > self.degree_limit:
+            self.n_violations += 1
 
+    def kruskal(self):
         edges = self.get_edges()
         edges.sort(key=lambda x: x[0])
         MST = [edges.pop()]
-        nodes_visited = [MST[0][1], MST[0][2]]
-        while len(MST) < (len(self.graph_matrix[0])-1):
+        nodes_visited = {MST[0][1]: 1, MST[0][2]: 1}
+        while len(nodes_visited) < (len(self.graph_matrix[0]) - 1):
             actual_edge = edges.pop()
-            if self.is_valid(actual_edge, MST, nodes_visited):
+            if self.is_valid(actual_edge, nodes_visited):
                 MST.append(actual_edge)
-                nodes_visited.append(actual_edge[2])
+                # Saco los nodos que toca el arco añadido para actualizar su grados en el diccionario nodes_visited
+                u, v = actual_edge[1], actual_edge[2]
+                nodes_visited[u] = nodes_visited.get(u, 0) + 1
+                nodes_visited[v] = nodes_visited.get(v, 0) + 1
 
         return MST, self.n_violations
 
-graph_matrix = [[0,3,1,0],
-                [3,0,2,4],
-                [1,2,0,5],
-                  [0,4,5,0]]
 
-graph = Graph_kruskal(graph_matrix,[3,4,5,1,0], 2)
+graph_matrix = [[0, 3, 1, 0],
+                [3, 0, 2, 4],
+                [1, 2, 0, 5],
+                [0, 4, 5, 0]]
+
+graph = Graph_kruskal(graph_matrix, [3, 4, 5, 1, 0], 2)
 print(graph.kruskal())
-

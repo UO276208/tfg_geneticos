@@ -1,7 +1,7 @@
-import prim_sin_restriciones as pr
-import kruskal_sin_restricciones as kr
+from fitness import prim_sin_restriciones as pr, kruskal_sin_restricciones as kr
 import numpy as np
-import lectorTSP
+from lectores_escritores import lectorTSP
+from lectores_escritores import results_writer
 
 prueba1 = [[0, 4, 3, 9],
            [4, 0, 8, 10],
@@ -13,11 +13,13 @@ prueba2 = [0,
            519, 455, 170, 0,
            434, 375, 265, 223, 0,
            200, 164, 344, 428, 273, 0]
-k = 1
+k = 4
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
 penalty_coefficient = 0.1
+
+rw = results_writer.ResultsWriter()
 
 #Variable global que guarde el coheficiente de penalizacion
 #Cada 10 (por ejemplo) generaciones sacar un vector con los fitness de la poblacion de la generación actual, meterlo en un diccionario
@@ -64,14 +66,19 @@ def ajust_penalty_coefficients(population, fitness_fn, graph_matrix):
             not_feasibles.append(pop)
 
     if len(not_feasibles) > 0:
-        feasible = sorted(feasibles, key=lambda pop: pop[0], reverse=True)[0]
-        not_feasible = sorted(not_feasibles, key=lambda pop: pop[0])[0]
-
-        penalty_coefficient = (feasible[0]-not_feasible[0])/(-(not_feasible[1])*not_feasible[0])
+        if len(feasibles) > 0:
+            feasible = sorted(feasibles, key=lambda pop: pop[0], reverse=True)[0]
+            not_feasible = sorted(not_feasibles, key=lambda pop: pop[0])[0]
+            rw.add_fitness_f(feasible[0])
+            rw.add_fitness_nf(not_feasible[0])
+            penalty_coefficient = (feasible[0]-not_feasible[0])/(-(not_feasible[1])*not_feasible[0])
+        else:#Esto no se si es buena idea, en teoria si no hay individuos que no violen restricciones
+            # querría intentar que haya asi que incremento la penalizacion por cada violacion de restriccion en un 10%
+            penalty_coefficient = penalty_coefficient * 1.1
 
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         #En intervalos de tamaño 5% de ngen se recalculan los coeficientes de penalizacion
         if generation % (ngen*0.05) == 0:
@@ -79,8 +86,12 @@ def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pm
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
         best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
-        print(str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
 
+        best_fitness = fitness_fn(best, graph_matrix)
+        rw.add_fitness(best_fitness)
+
+        print(str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
+    rw.write(file_name)
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -112,8 +123,6 @@ def mutate(x, pmut):
     i = np.random.randint(0, (len(x) - 2))
     x[i] = 1
     return x
-
-
 
 def uniform_crossover(x, y):
     probability_vector = np.random.randint(2, size=len(x))
@@ -192,6 +201,7 @@ chromosome0 = [1, 1, 1, 1, 0]
 
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-#print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,ngen=90))
+print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,'pruuevba',ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn_prim_penalty, prueba,ngen=400))
+#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_penalty, prueba,'prim_P80_G200',ngen=200))
+#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_penalty, prueba,'kruskal_P80_G200',ngen=200))

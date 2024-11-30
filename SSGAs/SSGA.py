@@ -1,7 +1,7 @@
-import prim
-import kruskal as kr
+from fitness import kruskal as kr, prim
 import numpy as np
-import lectorTSP
+from lectores_escritores import lectorTSP
+from lectores_escritores import results_writer
 
 prueba1 = [[0, 4, 3, 9],
            [4, 0, 8, 10],
@@ -17,6 +17,7 @@ k = 2
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
+rw = results_writer.ResultsWriter()
 
 
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
@@ -40,13 +41,15 @@ def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
 #############################
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
         best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
-        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
-
+        best_fitness = fitness_fn(best, graph_matrix)
+        rw.add_fitness(best_fitness)
+        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
+    rw.write(file_name)
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -146,17 +149,12 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     return competitors
 
 
-chromosome1 = [6, 12, 8, 2, 2]
-chromosome2 = [11, 10, 3, 1, 3]
-chromosome3 = [3, 10, 2, 6, 1]
-chromosome4 = [6, 5, 1, 12, 0]
-chromosome5 = [23, 15, 2, 4, 1]
-chromosome6 = [3, 10, 11, 9, 3]
-chromosome0 = [1, 1, 1, 1, 0]
+
 
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-print(genetic_algorithm_stepwise(init_population(50,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=400))
+print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'prim_h_P80_G200',ngen=200))
+print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))

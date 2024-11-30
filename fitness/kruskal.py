@@ -31,31 +31,31 @@ class Graph_kruskal:
                     cheapest = edge
         return cheapest
 
-    def is_valid(self, edge, MST, visited):
+    def is_valid(self, edge, visited):
         if edge[1] in visited and edge[2] in visited:
             return False
-        return self.check_degree_limit(edge, MST)
+        return self.check_degree_limit(edge, visited)
 
-    def check_degree_limit(self, edge, MST):
-        degree = 0
-        for mst_edge in MST:
-            if mst_edge[1] == edge[1] or mst_edge[2] == edge[1]:
-                degree += 1
-            if degree > (self.degree_limit - 1):
-                return False
+    def check_degree_limit(self, edge, visited):
+        degree_u = visited.get(edge[1], 0)
+        degree_v = visited.get(edge[2], 0)
+        if (degree_u + 1) > self.degree_limit or (degree_v + 1) > self.degree_limit:
+            return False
         return True
 
     def kruskal(self):
-
         edges = self.get_edges()
         edges.sort(key=lambda x: x[0])
         MST = [edges.pop()]
-        nodes_visited = [MST[0][1], MST[0][2]]
-        while len(MST) < (len(self.graph_matrix[0])-1):
+        nodes_visited = {MST[0][1]: 1, MST[0][2]: 1}
+        while len(nodes_visited) < (len(self.graph_matrix[0])-1):
             actual_edge = edges.pop()
-            if self.is_valid(actual_edge, MST, nodes_visited):
+            if self.is_valid(actual_edge, nodes_visited):
                 MST.append(actual_edge)
-                nodes_visited.append(actual_edge[2])
+                #Saco los nodos que toca el arco añadido para actualizar su grados en el diccionario nodes_visited
+                u, v = actual_edge[1], actual_edge[2]
+                nodes_visited[u] = nodes_visited.get(u, 0) + 1
+                nodes_visited[v] = nodes_visited.get(v, 0) + 1
 
         return MST
 

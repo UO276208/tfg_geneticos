@@ -1,3 +1,6 @@
+import os
+
+
 def read_LOWER_DIAG_ROW(size, numbers):
     size = 26
     matriz = [[0 for _ in range(size)] for _ in range(size)]
@@ -11,7 +14,10 @@ def read_LOWER_DIAG_ROW(size, numbers):
 
 
 def read_matrix(name):
-    with  open(name, mode="r") as archivo:
+    ruta_actual = os.path.dirname(os.path.abspath(__file__))
+
+    ruta_archivo = os.path.join(ruta_actual, "..", name)
+    with  open(ruta_archivo, mode="r") as archivo:
         empieza_matriz = False
         size = 0
         numbers = []
