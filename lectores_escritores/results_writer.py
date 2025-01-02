@@ -6,6 +6,7 @@ class ResultsWriter:
         self.fitnesses = []
         self.fitnesses_factibles = []
         self.fitnesses_no_factibles = []
+        self.time = 0
 
     def add_fitness(self, value):
         self.fitnesses.append(value)
@@ -16,9 +17,13 @@ class ResultsWriter:
     def add_fitness_nf(self, value):
         self.fitnesses_no_factibles.append(value)
 
+    def set_time(self, time):
+        self.time = time
+
     def write_file(self, list, nombre):
         if len(list) > 0:
             text = reduce(lambda a, b: str(a) + '\n' + str(b), list)
+            text += '\n' + str(self.time)
             with open(nombre, 'w') as f:
                 f.write(text)
             list.clear()

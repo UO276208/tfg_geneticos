@@ -42,7 +42,7 @@ def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
 #############################
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
@@ -50,7 +50,6 @@ def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, 
         best_fitness = fitness_fn(best, graph_matrix)
         rw.add_fitness(best_fitness)
         print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
-    rw.write(file_name)
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -160,7 +159,8 @@ prueba = lectorTSP.read_matrix("fri26.tsp")
 for i in range(0,10):
     print(str(i) + '------------------------------------------------------------------')
     inicio = time.time()
-    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'prim_h_P80_G200'+str(i),ngen=200))
+    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
     fin = time.time()
-    print('Tiempo' + str(i) + ' ' + str(fin - inicio))
+    rw.set_time(fin - inicio)
+    rw.write('prim_h_P80_G200-'+str(i))
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
