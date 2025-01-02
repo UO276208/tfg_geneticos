@@ -2,6 +2,7 @@ from fitness import prim_sin_restriciones as pr, kruskal_sin_restricciones as kr
 import numpy as np
 from lectores_escritores import lectorTSP
 from lectores_escritores import results_writer
+import time
 
 prueba1 = [[0, 4, 3, 9],
            [4, 0, 8, 10],
@@ -78,7 +79,7 @@ def ajust_penalty_coefficients(population, fitness_fn, graph_matrix):
 
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         #En intervalos de tamaño 5% de ngen se recalculan los coeficientes de penalizacion
         if generation % (ngen*0.05) == 0:
@@ -91,7 +92,6 @@ def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, file_name, 
         rw.add_fitness(best_fitness)
 
         print(str(best) + " Fitness:" + str(fitness_fn(best, graph_matrix)))
-    rw.write(file_name)
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -191,17 +191,17 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     return competitors
 
 
-chromosome1 = [6, 12, 8, 2, 2]
-chromosome2 = [11, 10, 3, 1, 3]
-chromosome3 = [3, 10, 2, 6, 1]
-chromosome4 = [6, 5, 1, 12, 0]
-chromosome5 = [23, 15, 2, 4, 1]
-chromosome6 = [3, 10, 11, 9, 3]
-chromosome0 = [1, 1, 1, 1, 0]
 
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,'pruuevba',ngen=90))
+#print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,'pruuevba',ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
+for i in range(0,10):
+    print(str(i) + '------------------------------------------------------------------')
+    inicio = time.time()
+    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_penalty, prueba,ngen=200))
+    fin = time.time()
+    rw.set_time(fin - inicio)
+    rw.write('prim_nh_P80_G200-'+str(i))
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_penalty, prueba,'prim_P80_G200',ngen=200))
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_penalty, prueba,'kruskal_P80_G200',ngen=200))
