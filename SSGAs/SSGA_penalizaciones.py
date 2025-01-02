@@ -37,7 +37,7 @@ def fitness_fn_prim_penalty(sample, graph_matrix_ft, ajusting=False):
     if ajusting:
         return real_cost, n_violations
     else:
-        return real_cost - (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
+        return real_cost + (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 
 def fitness_fn_kruskal_penalty(sample, graph_matrix_ft, ajusting=False):
@@ -50,7 +50,7 @@ def fitness_fn_kruskal_penalty(sample, graph_matrix_ft, ajusting=False):
     if ajusting:
         return real_cost, n_violations
     else:
-        return real_cost - (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
+        return real_cost + (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 #############################
 def ajust_penalty_coefficients(population, fitness_fn, graph_matrix):
