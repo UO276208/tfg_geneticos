@@ -2,6 +2,7 @@ from fitness import kruskal as kr, prim
 import numpy as np
 from lectores_escritores import lectorTSP
 from lectores_escritores import results_writer
+import time
 
 prueba1 = [[0, 4, 3, 9],
            [4, 0, 8, 10],
@@ -13,7 +14,7 @@ prueba2 = [0,
            519, 455, 170, 0,
            434, 375, 265, 223, 0,
            200, 164, 344, 428, 273, 0]
-k = 2
+k = 4
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
@@ -156,5 +157,10 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'prim_h_P80_G200',ngen=200))
-print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
+for i in range(0,10):
+    print(str(i) + '------------------------------------------------------------------')
+    inicio = time.time()
+    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'prim_h_P80_G200'+str(i),ngen=200))
+    fin = time.time()
+    print('Tiempo' + str(i) + ' ' + str(fin - inicio))
+#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
