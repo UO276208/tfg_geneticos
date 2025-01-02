@@ -73,6 +73,8 @@ def ajust_penalty_coefficients(population, fitness_fn, graph_matrix):
             rw.add_fitness_f(feasible[0])
             rw.add_fitness_nf(not_feasible[0])
             penalty_coefficient = (feasible[0]-not_feasible[0])/(-(not_feasible[1])*not_feasible[0])
+            if penalty_coefficient < 0:
+                penalty_coefficient = 0
         else:#Esto no se si es buena idea, en teoria si no hay individuos que no violen restricciones
             # querría intentar que haya asi que incremento la penalizacion por cada violacion de restriccion en un 10%
             penalty_coefficient = penalty_coefficient * 1.1
