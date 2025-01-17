@@ -1,9 +1,13 @@
 class Graph_prim:
-    def __init__(self, graph_matrix, chromosome, k):
+    def __init__(self, graph_matrix, chromosome, k, MST_to_complete):
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
         self.degree_limit = k
         self.edges_vault = []
+        self.MST_to_complete = self.check_and_TRANSFORM_MST(MST_to_complete)
+
+    def check_and_TRANSFORM_MST(self, MST_NC):
+        return True
 
     def get_edges(self):
         edges = []
@@ -60,12 +64,3 @@ class Graph_prim:
                 nodes_visited[nodes[0]] = 1
                 nodes_visited[nodes[1]] += 1
         return MST
-
-# graph_matrix = [[0,4,3,9],
-#                 [4,0,8,10],
-#                  [3,8,1,1],
-#                   [9,10,1,0]]
-#
-# graph = Graph(graph_matrix,[3,4,5,1,0], 2)
-# print(graph.prim(0))
-# [(3, 0, 2), (1, 2, 3), (3, 0, 2)]
