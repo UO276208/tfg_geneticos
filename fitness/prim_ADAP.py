@@ -1,12 +1,26 @@
 class Graph_prim:
-    def __init__(self, graph_matrix, chromosome, k, MST_to_complete):
+    def __init__(self, graph_matrix, k, MST_to_complete):
         self.graph_matrix = graph_matrix
-        self.chromosome = chromosome
+        self.chromosome = []
         self.degree_limit = k
         self.edges_vault = []
         self.MST_to_complete = self.check_and_TRANSFORM_MST(MST_to_complete)
 
+    def set_chromosome(self, chromosome):
+        self.chromosome = chromosome
+
     def check_and_TRANSFORM_MST(self, MST_NC):
+        nodes_visited = {}
+        for edge in MST_NC:
+            degree_u = nodes_visited.get(edge[1], 0)
+            degree_v = nodes_visited.get(edge[2], 0)
+
+            if (degree_u + 1) > self.degree_limit:
+                raise Exception("El grafo a completar excede la restricción de grado")
+            if (degree_v + 1) > self.degree_limit:
+                raise Exception("El grafo a completar excede la restricción de grado")
+            nodes_visited[edge[1]] = degree_u + 1
+            nodes_visited[edge[2]] = degree_v + 1
         return True
 
     def get_edges(self):

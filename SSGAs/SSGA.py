@@ -22,7 +22,7 @@ rw = results_writer.ResultsWriter()
 
 
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
-    graph = prim.Graph_prim(graph_matrix_ft, sample, k, input_data_type='gm')
+    graph = prim.Graph_prim(graph_matrix_ft, sample, k)
     mst = graph.prim()
     real_cost = 0
     for edge in mst:
@@ -156,11 +156,12 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-for i in range(0,10):
-    print(str(i) + '------------------------------------------------------------------')
-    inicio = time.time()
-    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
-    fin = time.time()
-    rw.set_time(fin - inicio)
-    rw.write('prim_h_P80_G200-'+str(i))
+print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
+#for i in range(0,10):
+    #print(str(i) + '------------------------------------------------------------------')
+    #inicio = time.time()
+    #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
+    #fin = time.time()
+    #rw.set_time(fin - inicio)
+    #rw.write('prim_h_P80_G200-'+str(i))
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
