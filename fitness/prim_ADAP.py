@@ -4,24 +4,29 @@ class Graph_prim:
         self.chromosome = []
         self.degree_limit = k
         self.edges_vault = []
+        self.nodes_visited = {}
         self.MST_to_complete = self.check_and_TRANSFORM_MST(MST_to_complete)
 
-    def set_chromosome(self, chromosome):
-        self.chromosome = chromosome
-
     def check_and_TRANSFORM_MST(self, MST_NC):
-        nodes_visited = {}
+        biggest_node = 0
+        #Tengo que comprobar que los lados van a nodos existentes,
+        # por ejemplo que no existe un arco del nodo 1 al 15 en un grafo de 8 nodos
         for edge in MST_NC:
-            degree_u = nodes_visited.get(edge[1], 0)
-            degree_v = nodes_visited.get(edge[2], 0)
+            if edge[1] > biggest_node:
+                biggest_node = edge[1]
+            elif edge[2] > biggest_node:
+                biggest_node = edge[2]
+            degree_u = self.nodes_visited.get(edge[1], 0)
+            degree_v = self.nodes_visited.get(edge[2], 0)
 
-            if (degree_u + 1) > self.degree_limit:
-                raise Exception("El grafo a completar excede la restricción de grado")
-            if (degree_v + 1) > self.degree_limit:
-                raise Exception("El grafo a completar excede la restricción de grado")
-            nodes_visited[edge[1]] = degree_u + 1
-            nodes_visited[edge[2]] = degree_v + 1
-        return True
+            if self.is_valid(edge):
+                self.nodes_visited[edge[1]] = degree_u + 1
+                self.nodes_visited[edge[2]] = degree_v + 1
+            else:
+                raise Exception("El grafo a completar excede la restricción de grado o contiene ciclos")
+        if biggest_node >= len(self.graph_matrix):
+            raise Exception("El grafo a completar contiene aristas que van a nodos inexistentes")
+        return MST_NC
 
     def get_edges(self):
         edges = []
@@ -36,45 +41,40 @@ class Graph_prim:
         self.edges_vault = list(edges)
         return edges
 
-    def get_cheapest_edge(self, vertexs, edges):
-        vertexs_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
+    def get_cheapest_edge(self, edges):
+        vertexs_filtered = list(filter(lambda edge: edge[1] in self.nodes_visited or edge[2] in self.nodes_visited, edges))
         vertexs_filtered.sort()
         return vertexs_filtered[0]
 
-    def is_valid(self, edge, visited):
-        if edge[1] in visited and edge[2] in visited:
+    def is_valid(self, edge):
+        if edge[1] in self.nodes_visited and edge[2] in self.nodes_visited:
             return False
-        return self.check_degree_limit(edge, visited)
+        return self.check_degree_limit(edge)
 
-    def check_degree_limit(self, edge, visited):
-        degree_u = visited.get(edge[1], 0)
-        degree_v = visited.get(edge[2], 0)
+    def check_degree_limit(self, edge):
+        degree_u = self.nodes_visited.get(edge[1], 0)
+        degree_v = self.nodes_visited.get(edge[2], 0)
         if (degree_u + 1) > self.degree_limit or (degree_v + 1) > self.degree_limit:
             return False
         return True
 
-    def get_the_other_edge(self, nodes_visited, edge):
-        if edge[1] in nodes_visited:
+    def get_the_other_edge(self, edge):
+        if edge[1] in self.nodes_visited:
             return edge[2], edge[1]
         else:
             return edge[1], edge[2]
 
-    def prim(self):
-        start_vertex = self.chromosome[len(self.chromosome) - 1]
+    def prim(self, chromosome):
+        self.chromosome = chromosome
         edges = self.get_edges()
         MST = []
-        nodes_visited = {start_vertex: 1}
-        actual_edge = self.get_cheapest_edge([start_vertex], edges)
-        MST.append(actual_edge)
-        nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
-        edges.remove(actual_edge)
 
-        while len(nodes_visited) < (len(self.graph_matrix)):
-            actual_edge = self.get_cheapest_edge(nodes_visited, edges)
+        while len(self.nodes_visited) < (len(self.graph_matrix)):
+            actual_edge = self.get_cheapest_edge(edges)
             edges.remove(actual_edge)
-            if self.is_valid(actual_edge, nodes_visited):
+            if self.is_valid(actual_edge):
                 MST.append(actual_edge)
-                nodes = self.get_the_other_edge(nodes_visited, actual_edge)
-                nodes_visited[nodes[0]] = 1
-                nodes_visited[nodes[1]] += 1
-        return MST
+                nodes = self.get_the_other_edge(actual_edge)
+                self.nodes_visited[nodes[0]] = 1
+                self.nodes_visited[nodes[1]] += 1
+        return self.MST_to_complete + MST

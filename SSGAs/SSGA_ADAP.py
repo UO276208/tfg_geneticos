@@ -22,8 +22,7 @@ rw = results_writer.ResultsWriter()
 
 
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
-    graph_prim.set_chromosome(sample)
-    mst = graph_prim.prim()
+    mst = graph_prim.prim(sample)
     real_cost = 0
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
@@ -140,19 +139,31 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     return competitors
 
 
-def init_algorithm(pop_number, graph_size, fitness, graph_matrix, ngen, partial_MST):
+def init_algorithm(pop_number, fitness, graph_matrix, ngen, partial_MST):
 
-    return genetic_algorithm_stepwise(partial_MST, init_population(pop_number, graph_size), fitness, graph_matrix, ngen=ngen)
+    return genetic_algorithm_stepwise(partial_MST, init_population(pop_number, len(graph_matrix)), fitness, graph_matrix, ngen=ngen)
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-partial_MST = []
-for i in range(0,10):
-    print(str(i) + '------------------------------------------------------------------')
-    inicio = time.time()
-    print(init_algorithm(80, len(prueba), fitness_fn_prim_hard_degree_limit, prueba, 100, partial_MST))
-    fin = time.time()
-    rw.set_time(fin - inicio)
-    rw.write('prim_h_P80_G200-'+str(i))
+partial_MST = [[1,0,6],[3,2,4],[1,4,9],[2,2,6]]
+matriz_adyacencia = [
+    [0, 3, 7, 2, 5, 9, 1, 4, 8, 6],
+    [3, 0, 6, 4, 8, 2, 7, 5, 9, 1],
+    [7, 6, 0, 5, 3, 8, 2, 9, 4, 10],
+    [2, 4, 5, 0, 7, 6, 3, 8, 1, 9],
+    [5, 8, 3, 7, 0, 4, 6, 2, 10, 1],
+    [9, 2, 8, 6, 4, 0, 5, 3, 7, 10],
+    [1, 7, 2, 3, 6, 5, 0, 10, 9, 4],
+    [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
+    [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
+    [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
+grafo = [[0,4,10,3,2],
+         [4, 0, 1, 5, 1],
+         [10,1, 0, 2, 4],
+         [3, 5, 2, 0 ,6],
+         [2, 1, 4, 6, 0]]
+
+print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, matriz_adyacencia, 100, partial_MST))
+#UnionFind
