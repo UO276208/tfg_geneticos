@@ -1,4 +1,4 @@
-class Graph_prim:
+class GraphPrim:
     def __init__(self, graph_matrix, k, MST_to_complete):
         self.graph_matrix = graph_matrix
         self.chromosome = []

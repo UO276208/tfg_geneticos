@@ -165,4 +165,3 @@ print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_pri
     #rw.set_time(fin - inicio)
     #rw.write('prim_h_P80_G200-'+str(i))
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
-f
