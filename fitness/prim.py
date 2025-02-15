@@ -1,5 +1,5 @@
 class Graph_prim:
-    def __init__(self, graph_matrix, chromosome, k, input_data_type='gm'):
+    def __init__(self, graph_matrix, chromosome, k):
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
         self.degree_limit = k

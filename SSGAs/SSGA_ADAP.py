@@ -1,4 +1,4 @@
-from fitness import kruskal as kr, prim
+from fitness import prim_ADAP as prim
 import numpy as np
 from lectores_escritores import lectorTSP
 from lectores_escritores import results_writer
@@ -21,49 +21,39 @@ tournament_size = 0.2
 rw = results_writer.ResultsWriter()
 
 
-def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
-    graph = prim.Graph_prim(graph_matrix_ft, sample, k)
-    mst = graph.prim()
+def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
+    mst = graph_prim.prim(sample)
     real_cost = 0
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
     return real_cost
 
-
-def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
-    graph = kr.Graph_kruskal(graph_matrix_ft, sample, k, input_data_type='gm')
-    mst = graph.kruskal()
-    real_cost = 0
-    for edge in mst:
-        real_cost += graph_matrix_ft[edge[1]][edge[2]]
-    return real_cost
-
-
 #############################
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+    graph_prim = prim.Graph_prim(graph_matrix, k, partial_MST)
     for generation in range(int(ngen)):
-        offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
-        population = replace_worst(population, offspring, fitness_fn, graph_matrix)
-        best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
-        best_fitness = fitness_fn(best, graph_matrix)
+        offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim)
+        population = replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim)
+        best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
+        best_fitness = fitness_fn(best, graph_matrix, graph_prim)
         rw.add_fitness(best_fitness)
         print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
-    return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
+    return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
 
 
-def replace_worst(population, offspring, fitness_fn, graph_matrix):
-    ordered_population = sorted(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix), reverse=True)
+def replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim):
+    ordered_population = sorted(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim), reverse=True)
     for i in range(0, len(offspring)):
-        if fitness_fn(offspring[i], graph_matrix) < fitness_fn(ordered_population[i], graph_matrix):
+        if fitness_fn(offspring[i], graph_matrix, graph_prim) < fitness_fn(ordered_population[i], graph_matrix, graph_prim):
             ordered_population[i] = offspring[i]
     return ordered_population
 
 
-def generate_offspring(population, fitness_fn, graph_matrix, pmut):
+def generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim):
     offspring = []
-    x, y = tournament(population, fitness_fn, graph_matrix)
+    x, y = tournament(population, fitness_fn, graph_matrix, graph_prim)
     i = 0
     while len(offspring) < number_of_sons and i <= 10:
         son = uniform_crossover(x, y)
@@ -115,21 +105,21 @@ def init_population(pop_number, graph_size):
     return population
 
 
-def tournament(population, fitness_fn, graph_matrix):
+def tournament(population, fitness_fn, graph_matrix, graph_prim):
     parents = []
 
-    parents.append(get_winers(population, fitness_fn, graph_matrix))
-    parents.append(get_winers(population, fitness_fn, graph_matrix))
+    parents.append(get_winers(population, fitness_fn, graph_matrix, graph_prim))
+    parents.append(get_winers(population, fitness_fn, graph_matrix, graph_prim))
 
     return parents
 
 
-def get_winers(population, fitness_fn, graph_matrix):
+def get_winers(population, fitness_fn, graph_matrix, graph_prim):
     window_size = round(len(population) * tournament_size)
     start_point_window = np.random.randint(0, len(population) - window_size)
 
     competitors = get_competitors(population, start_point_window, window_size, 6)
-    ordered_competitors = sorted(competitors, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
+    ordered_competitors = sorted(competitors, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
 
     return ordered_competitors[0]
 
@@ -149,20 +139,31 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     return competitors
 
 
+def init_algorithm(pop_number, fitness, graph_matrix, ngen, partial_MST):
 
-
+    return genetic_algorithm_stepwise(partial_MST, init_population(pop_number, len(graph_matrix)), fitness, graph_matrix, ngen=ngen)
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
-#for i in range(0,10):
-    #print(str(i) + '------------------------------------------------------------------')
-    #inicio = time.time()
-    #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
-    #fin = time.time()
-    #rw.set_time(fin - inicio)
-    #rw.write('prim_h_P80_G200-'+str(i))
-#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))
-f
+partial_MST = [[1,0,6],[3,2,4],[1,4,9],[2,2,6]]
+matriz_adyacencia = [
+    [0, 3, 7, 2, 5, 9, 1, 4, 8, 6],
+    [3, 0, 6, 4, 8, 2, 7, 5, 9, 1],
+    [7, 6, 0, 5, 3, 8, 2, 9, 4, 10],
+    [2, 4, 5, 0, 7, 6, 3, 8, 1, 9],
+    [5, 8, 3, 7, 0, 4, 6, 2, 10, 1],
+    [9, 2, 8, 6, 4, 0, 5, 3, 7, 10],
+    [1, 7, 2, 3, 6, 5, 0, 10, 9, 4],
+    [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
+    [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
+    [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
+grafo = [[0,4,10,3,2],
+         [4, 0, 1, 5, 1],
+         [10,1, 0, 2, 4],
+         [3, 5, 2, 0 ,6],
+         [2, 1, 4, 6, 0]]
+
+print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, matriz_adyacencia, 100, partial_MST))
+#UnionFind
