@@ -32,7 +32,7 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
 #############################
 
 def genetic_algorithm_stepwise(partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
-    graph_prim = prim.Graph_prim(graph_matrix, k, partial_MST)
+    graph_prim = prim.GraphPrim(graph_matrix, k, partial_MST)
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim)
