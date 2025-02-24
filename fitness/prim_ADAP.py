@@ -1,5 +1,7 @@
+from util import union_find
 class Graph_prim:
     def __init__(self, graph_matrix, k, MST_to_complete):
+        self.uf = union_find.UnionFind(len(graph_matrix))
         self.graph_matrix = graph_matrix
         self.chromosome = []
         self.degree_limit = k
@@ -11,21 +13,21 @@ class Graph_prim:
         biggest_node = 0
         #Tengo que comprobar que los lados van a nodos existentes,
         # por ejemplo que no existe un arco del nodo 1 al 15 en un grafo de 8 nodos
-        for edge in MST_NC:
-            if edge[1] > biggest_node:
-                biggest_node = edge[1]
-            elif edge[2] > biggest_node:
-                biggest_node = edge[2]
-            degree_u = self.nodes_visited.get(edge[1], 0)
-            degree_v = self.nodes_visited.get(edge[2], 0)
+        for c, u, v in MST_NC:
+            if u > biggest_node:
+                biggest_node = u
+            elif v > biggest_node:
+                biggest_node = v
+            if biggest_node >= len(self.graph_matrix):
+                raise Exception("El grafo a completar contiene aristas que van a nodos inexistentes")
+            degree_u = self.nodes_visited.get(u, 0)
+            degree_v = self.nodes_visited.get(v, 0)
 
-            if self.is_valid(edge):
-                self.nodes_visited[edge[1]] = degree_u + 1
-                self.nodes_visited[edge[2]] = degree_v + 1
+            if self.is_valid([c,u,v]):
+                self.nodes_visited[v] = degree_u + 1
+                self.nodes_visited[v] = degree_v + 1
             else:
                 raise Exception("El grafo a completar excede la restricción de grado o contiene ciclos")
-        if biggest_node >= len(self.graph_matrix):
-            raise Exception("El grafo a completar contiene aristas que van a nodos inexistentes")
         return MST_NC
 
     def get_edges(self):
@@ -47,7 +49,7 @@ class Graph_prim:
         return vertexs_filtered[0]
 
     def is_valid(self, edge):
-        if edge[1] in self.nodes_visited and edge[2] in self.nodes_visited:
+        if not self.uf.union(edge[1],edge[2]):
             return False
         return self.check_degree_limit(edge)
 

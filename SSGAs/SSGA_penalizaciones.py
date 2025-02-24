@@ -1,7 +1,7 @@
 from fitness import prim_sin_restriciones as pr, kruskal_sin_restricciones as kr
 import numpy as np
-from lectores_escritores import lectorTSP
-from lectores_escritores import results_writer
+from util import lectorTSP
+from util import results_writer
 import time
 
 prueba1 = [[0, 4, 3, 9],
