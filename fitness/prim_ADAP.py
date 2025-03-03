@@ -24,7 +24,7 @@ class Graph_prim:
             degree_v = self.nodes_visited.get(v, 0)
 
             if self.is_valid([c,u,v]):
-                self.nodes_visited[v] = degree_u + 1
+                self.nodes_visited[u] = degree_u + 1
                 self.nodes_visited[v] = degree_v + 1
             else:
                 raise Exception("El grafo a completar excede la restricción de grado o contiene ciclos")

@@ -32,7 +32,7 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
 #############################
 
 def genetic_algorithm_stepwise(partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
-    graph_prim = prim.GraphPrim(graph_matrix, k, partial_MST)
+    graph_prim = prim.Graph_prim(graph_matrix, k, partial_MST)
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim)
@@ -147,7 +147,7 @@ def init_algorithm(pop_number, fitness, graph_matrix, ngen, partial_MST):
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
-partial_MST = [[1,0,6],[3,2,4],[1,4,9],[2,2,6]]
+partial_MST2 = [[1,0,6],[3,2,4],[1,4,9],[2,2,6]]
 matriz_adyacencia = [
     [0, 3, 7, 2, 5, 9, 1, 4, 8, 6],
     [3, 0, 6, 4, 8, 2, 7, 5, 9, 1],
@@ -159,11 +159,12 @@ matriz_adyacencia = [
     [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
     [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
+partial_MST = [[10,0,2],[4,2,4]]
 grafo = [[0,4,10,3,2],
          [4, 0, 1, 5, 1],
          [10,1, 0, 2, 4],
          [3, 5, 2, 0 ,6],
          [2, 1, 4, 6, 0]]
 
-print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, matriz_adyacencia, 100, partial_MST))
+print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, grafo, 100, partial_MST))
 #UnionFind
