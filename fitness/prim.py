@@ -1,5 +1,8 @@
+from exceptions.ImpossibleTreeException import ImpossibleTreeException
+from util import union_find
 class Graph_prim:
     def __init__(self, graph_matrix, chromosome, k):
+        self.uf = union_find.UnionFind(len(graph_matrix))
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
         self.degree_limit = k
@@ -13,18 +16,18 @@ class Graph_prim:
                 if i != j:
                     if i < j:
                         edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], i, j))
-                    else:
-                        edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], j, i))
         self.edges_vault = list(edges)
         return edges
 
     def get_cheapest_edge(self, vertexs, edges):
-        vertexs_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
-        vertexs_filtered.sort()
-        return vertexs_filtered[0]
+        edges_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
+        edges_filtered.sort()
+        if len(edges_filtered) <= 0:
+            raise ImpossibleTreeException('No se puede completar el arbol')
+        return edges_filtered[0]
 
     def is_valid(self, edge, visited):
-        if edge[1] in visited and edge[2] in visited:
+        if not self.uf.union(edge[1], edge[2]):
             return False
         return self.check_degree_limit(edge, visited)
 
@@ -48,6 +51,7 @@ class Graph_prim:
         nodes_visited = {start_vertex: 1}
         actual_edge = self.get_cheapest_edge([start_vertex], edges)
         MST.append(actual_edge)
+        self.uf.union(actual_edge[1], actual_edge[2])
         nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
         edges.remove(actual_edge)
 
@@ -60,12 +64,3 @@ class Graph_prim:
                 nodes_visited[nodes[0]] = 1
                 nodes_visited[nodes[1]] += 1
         return MST
-
-# graph_matrix = [[0,4,3,9],
-#                 [4,0,8,10],
-#                  [3,8,1,1],
-#                   [9,10,1,0]]
-#
-# graph = Graph(graph_matrix,[3,4,5,1,0], 2)
-# print(graph.prim(0))
-# [(3, 0, 2), (1, 2, 3), (3, 0, 2)]

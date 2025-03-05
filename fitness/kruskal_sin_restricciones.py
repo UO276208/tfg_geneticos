@@ -1,5 +1,7 @@
+from util import union_find
 class Graph_kruskal:
     def __init__(self, graph_matrix, chromosome, k, input_data_type='gm'):
+        self.uf = union_find.UnionFind(len(graph_matrix))
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
         self.degree_limit = k
@@ -33,7 +35,7 @@ class Graph_kruskal:
         return cheapest
 
     def is_valid(self, edge, visited):
-        if edge[1] in visited and edge[2] in visited:
+        if not self.uf.union(edge[1], edge[2]):
             return False
         else:
             self.check_degree_limit(edge, visited)
@@ -50,7 +52,9 @@ class Graph_kruskal:
     def kruskal(self):
         edges = self.get_edges()
         edges.sort(key=lambda x: x[0])
-        MST = [edges.pop()]
+        actual_edge = edges.pop()
+        MST = [actual_edge]
+        self.uf.union(actual_edge[1], actual_edge[2])
         nodes_visited = {MST[0][1]: 1, MST[0][2]: 1}
         while len(nodes_visited) < (len(self.graph_matrix[0]) - 1):
             actual_edge = edges.pop()

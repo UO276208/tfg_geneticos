@@ -1,5 +1,7 @@
+from util import union_find
 class Graph_prim:
     def __init__(self, graph_matrix, chromosome, k, input_data_type='gm'):
+        self.uf = union_find.UnionFind(len(graph_matrix))
         self.graph_matrix = graph_matrix
         self.chromosome = chromosome
         self.degree_limit = k
@@ -39,7 +41,7 @@ class Graph_prim:
         return vertexs_filtered[0]
 
     def is_valid(self, edge, visited):
-        if edge[1] in visited and edge[2] in visited:
+        if not self.uf.union(edge[1], edge[2]):
             return False
         else:
             self.check_degree_limit(edge, visited)
@@ -66,6 +68,7 @@ class Graph_prim:
         nodes_visited = {start_vertex: 1}
         actual_edge = self.get_cheapest_edge([start_vertex], edges)
         MST.append(actual_edge)
+        self.uf.union(actual_edge[1], actual_edge[2])
         nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
         edges.remove(actual_edge)
 
