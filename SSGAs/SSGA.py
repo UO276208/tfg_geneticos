@@ -32,6 +32,7 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
             real_cost += graph_matrix_ft[edge[1]][edge[2]]
         return real_cost
     except ImpossibleTreeException:
+        print('EEEEEEEEEEE')
         return np.sum(graph_matrix_ft)
 
 
@@ -54,7 +55,7 @@ def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pm
         best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
         best_fitness = fitness_fn(best, graph_matrix)
         rw.add_fitness(best_fitness)
-        #print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
+        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -182,7 +183,7 @@ matriz_adyacencia = [
     [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
     [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-#print(genetic_algorithm_stepwise(init_population(80,len(matriz_adyacencia)), fitness_fn_prim_hard_degree_limit, matriz_adyacencia,ngen=200))
+print(genetic_algorithm_stepwise(init_population(80,len(matriz_adyacencia)), fitness_fn_prim_hard_degree_limit, matriz_adyacencia,ngen=200))
 #for i in range(0,10):
     #print(str(i) + '------------------------------------------------------------------')
     #inicio = time.time()

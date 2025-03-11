@@ -14,7 +14,7 @@ prueba2 = [0,
            519, 455, 170, 0,
            434, 375, 265, 223, 0,
            200, 164, 344, 428, 273, 0]
-k = 4
+k = 8
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
@@ -147,6 +147,13 @@ def init_algorithm(pop_number, fitness, graph_matrix, ngen, partial_MST):
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
 #print(genetic_algorithm_stepwise(init_population(50, len(prueba1)), fitness_fn_kruskal_hard_degree_limit, prueba1, ngen=90))
 prueba = lectorTSP.read_matrix("fri26.tsp")
+prueba_sub =arcos = [
+    [11, 4, 5],
+    [9, 5, 6],
+    [22, 9, 10],
+    [18, 11, 12],
+    [13, 19, 20]
+]
 partial_MST2 = [[1,0,6],[3,2,4],[1,4,9],[2,2,6]]
 matriz_adyacencia = [
     [0, 3, 7, 2, 5, 9, 1, 4, 8, 6],
@@ -166,5 +173,5 @@ grafo = [[0,4,10,3,2],
          [3, 5, 2, 0 ,6],
          [2, 1, 4, 6, 0]]
 
-print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, grafo, 100, partial_MST))
+print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, prueba, 100, prueba_sub))
 #UnionFind

@@ -1,5 +1,7 @@
 from exceptions.ImpossibleTreeException import ImpossibleTreeException
-from util import union_find
+from util import union_find, fitnessDataLogger
+
+
 class Graph_prim:
     def __init__(self, graph_matrix, chromosome, k):
         self.uf = union_find.UnionFind(len(graph_matrix))
@@ -7,6 +9,7 @@ class Graph_prim:
         self.chromosome = chromosome
         self.degree_limit = k
         self.edges_vault = []
+        self.log = fitnessDataLogger.FitnessDataLogger('Prim_test')
 
     def get_edges(self):
         edges = []
