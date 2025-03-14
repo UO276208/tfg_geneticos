@@ -9,7 +9,7 @@ class Graph_prim:
         self.chromosome = chromosome
         self.degree_limit = k
         self.edges_vault = []
-        self.log = fitnessDataLogger.FitnessDataLogger('Prim_test')
+        self.log = fitnessDataLogger.FitnessDataLogger()
 
     def get_edges(self):
         edges = []
@@ -25,6 +25,8 @@ class Graph_prim:
     def get_cheapest_edge(self, vertexs, edges):
         edges_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
         edges_filtered.sort()
+        self.log.add_filtered_edges(edges_filtered)
+        self.log.add_nodes_visited(vertexs)
         if len(edges_filtered) <= 0:
             raise ImpossibleTreeException('No se puede completar el arbol')
         return edges_filtered[0]
@@ -50,6 +52,7 @@ class Graph_prim:
     def prim(self):
         start_vertex = self.chromosome[len(self.chromosome) - 1]
         edges = self.get_edges()
+        self.log.add_edges(edges)
         MST = []
         nodes_visited = {start_vertex: 1}
         actual_edge = self.get_cheapest_edge([start_vertex], edges)
@@ -59,6 +62,7 @@ class Graph_prim:
         edges.remove(actual_edge)
 
         while len(nodes_visited) < (len(self.graph_matrix)):
+            self.log.add_MST(MST)
             actual_edge = self.get_cheapest_edge(nodes_visited, edges)
             edges.remove(actual_edge)
             if self.is_valid(actual_edge, nodes_visited):
@@ -66,4 +70,5 @@ class Graph_prim:
                 nodes = self.get_the_other_edge(nodes_visited, actual_edge)
                 nodes_visited[nodes[0]] = 1
                 nodes_visited[nodes[1]] += 1
+        self.log.write('Prim_LOG'+ str(self.chromosome) + '.txt')
         return MST
