@@ -9,7 +9,7 @@ class Graph_prim:
         self.chromosome = chromosome
         self.degree_limit = k
         self.edges_vault = []
-        self.log = fitnessDataLogger.FitnessDataLogger()
+        self.log = fitnessDataLogger.FitnessDataLogger(False)
 
     def get_edges(self):
         edges = []
@@ -26,15 +26,20 @@ class Graph_prim:
         edges_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
         edges_filtered.sort()
         self.log.add_filtered_edges(edges_filtered)
-        self.log.add_nodes_visited(vertexs)
         if len(edges_filtered) <= 0:
+            self.log.add_nodes_visited(vertexs)
+            self.log.write('FAIL-Prim_LOG' + str(self.chromosome) + '.txt')
             raise ImpossibleTreeException('No se puede completar el arbol')
+
         return edges_filtered[0]
 
     def is_valid(self, edge, visited):
-        if not self.uf.union(edge[1], edge[2]):
+        if not self.check_degree_limit(edge, visited):
             return False
-        return self.check_degree_limit(edge, visited)
+        elif not self.uf.union(edge[1], edge[2]):
+            return False
+        else:
+            return True
 
     def check_degree_limit(self, edge, visited):
         degree_u = visited.get(edge[1], 0)
@@ -54,15 +59,13 @@ class Graph_prim:
         edges = self.get_edges()
         self.log.add_edges(edges)
         MST = []
-        nodes_visited = {start_vertex: 1}
         actual_edge = self.get_cheapest_edge([start_vertex], edges)
+        nodes_visited = {actual_edge[1]: 1, actual_edge[2]: 1}
         MST.append(actual_edge)
         self.uf.union(actual_edge[1], actual_edge[2])
-        nodes_visited[self.get_the_other_edge(nodes_visited, actual_edge)[0]] = 1
         edges.remove(actual_edge)
 
         while len(nodes_visited) < (len(self.graph_matrix)):
-            self.log.add_MST(MST)
             actual_edge = self.get_cheapest_edge(nodes_visited, edges)
             edges.remove(actual_edge)
             if self.is_valid(actual_edge, nodes_visited):
@@ -70,5 +73,7 @@ class Graph_prim:
                 nodes = self.get_the_other_edge(nodes_visited, actual_edge)
                 nodes_visited[nodes[0]] = 1
                 nodes_visited[nodes[1]] += 1
+            self.log.add_nodes_visited(nodes_visited)
+            self.log.add_MST(MST)
         self.log.write('Prim_LOG'+ str(self.chromosome) + '.txt')
         return MST
