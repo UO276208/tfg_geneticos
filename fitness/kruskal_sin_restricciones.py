@@ -21,18 +21,8 @@ class Graph_kruskal:
                 if i != j:
                     if i < j:
                         edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], i, j))
-                    else:
-                        edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], j, i))
         self.edges_vault = list(edges)
         return edges
-
-    def get_cheapest_edge(self, vertex, edges):
-        cheapest = edges[0]
-        for edge in edges:
-            if edge[1] == vertex:
-                if edge[0] < cheapest[0]:
-                    cheapest = edge
-        return cheapest
 
     def is_valid(self, edge, visited):
         if not self.uf.union(edge[1], edge[2]):

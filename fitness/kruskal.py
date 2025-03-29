@@ -9,10 +9,6 @@ class Graph_kruskal:
         self.input_data_type = input_data_type
 
     def get_edges(self):
-        if self.input_data_type == 'gm':
-            return self.get_edges_gm()
-
-    def get_edges_gm(self):
         edges = []
 
         for i in range(0, len(self.graph_matrix)):
@@ -20,23 +16,16 @@ class Graph_kruskal:
                 if i != j:
                     if i < j:
                         edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], i, j))
-                    else:
-                        edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], j, i))
         self.edges_vault = list(edges)
         return edges
 
-    def get_cheapest_edge(self, vertex, edges):
-        cheapest = edges[0]
-        for edge in edges:
-            if edge[1] == vertex:
-                if edge[0] < cheapest[0]:
-                    cheapest = edge
-        return cheapest
-
     def is_valid(self, edge, visited):
-        if not self.uf.union(edge[1],edge[2]):
+        if not self.check_degree_limit(edge, visited):
             return False
-        return self.check_degree_limit(edge, visited)
+        elif not self.uf.union(edge[1], edge[2]):
+            return False
+        else:
+            return True
 
     def check_degree_limit(self, edge, visited):
         degree_u = visited.get(edge[1], 0)

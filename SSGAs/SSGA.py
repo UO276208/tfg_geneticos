@@ -183,7 +183,7 @@ matriz_adyacencia = [
     [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
     [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
+print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_hard_degree_limit, prueba,ngen=200))
 #for i in range(0,10):
     #print(str(i) + '------------------------------------------------------------------')
     #inicio = time.time()

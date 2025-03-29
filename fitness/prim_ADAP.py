@@ -1,3 +1,4 @@
+from exceptions.ImpossibleTreeException import ImpossibleTreeException
 from util import union_find
 class Graph_prim:
     def __init__(self, graph_matrix, k, MST_to_complete):
@@ -9,10 +10,10 @@ class Graph_prim:
         self.nodes_visited = {}
         self.MST_to_complete = self.check_and_TRANSFORM_MST(MST_to_complete)
 
+    #Compruebo que el grafo a completar no tiene ciclos, no sobrepasa el limite de grado
+    #y si sus aristas son correctas (solo unen nodos existentes)
     def check_and_TRANSFORM_MST(self, MST_NC):
         biggest_node = 0
-        #Tengo que comprobar que los lados van a nodos existentes,
-        # por ejemplo que no existe un arco del nodo 1 al 15 en un grafo de 8 nodos
         for c, u, v in MST_NC:
             if u > biggest_node:
                 biggest_node = u
@@ -38,20 +39,23 @@ class Graph_prim:
                 if i != j:
                     if i < j:
                         edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], i, j))
-                    else:
-                        edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], j, i))
         self.edges_vault = list(edges)
         return edges
 
     def get_cheapest_edge(self, edges):
         vertexs_filtered = list(filter(lambda edge: edge[1] in self.nodes_visited or edge[2] in self.nodes_visited, edges))
         vertexs_filtered.sort()
+        if len(vertexs_filtered) <= 0:
+            raise ImpossibleTreeException('No se puede completar el arbol')
         return vertexs_filtered[0]
 
-    def is_valid(self, edge):
-        if not self.uf.union(edge[1],edge[2]):
+    def is_valid(self, edge, visited):
+        if not self.check_degree_limit(edge):
             return False
-        return self.check_degree_limit(edge)
+        elif not self.uf.union(edge[1], edge[2]):
+            return False
+        else:
+            return True
 
     def check_degree_limit(self, edge):
         degree_u = self.nodes_visited.get(edge[1], 0)

@@ -1,7 +1,5 @@
 from exceptions.ImpossibleTreeException import ImpossibleTreeException
 from util import union_find, fitnessDataLogger
-
-
 class Graph_prim:
     def __init__(self, graph_matrix, chromosome, k):
         self.uf = union_find.UnionFind(len(graph_matrix))
@@ -70,9 +68,9 @@ class Graph_prim:
             edges.remove(actual_edge)
             if self.is_valid(actual_edge, nodes_visited):
                 MST.append(actual_edge)
-                nodes = self.get_the_other_edge(nodes_visited, actual_edge)
-                nodes_visited[nodes[0]] = 1
-                nodes_visited[nodes[1]] += 1
+                u, v = actual_edge[1], actual_edge[2]
+                nodes_visited[u] = nodes_visited.get(u, 0) + 1
+                nodes_visited[v] = nodes_visited.get(v, 0) + 1
             self.log.add_nodes_visited(nodes_visited)
             self.log.add_MST(MST)
         self.log.write('Prim_LOG'+ str(self.chromosome) + '.txt')
