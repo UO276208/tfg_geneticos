@@ -13,7 +13,7 @@ class Graph_kruskal:
 
         for i in range(0, len(self.graph_matrix)):
             for j in range(0, len(self.graph_matrix)):
-                if i != j:
+                if self.graph_matrix[i][j] != 0:
                     if i < j:
                         edges.append((self.graph_matrix[i][j] * self.chromosome[i] * self.chromosome[j], i, j))
         self.edges_vault = list(edges)

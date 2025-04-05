@@ -10,7 +10,7 @@ if __name__ == "__main__":
     prueba = lectorTSP.read_matrix("fri26.tsp")
 
     for i in range(num_ejecuciones):
-        proceso = multiprocessing.Process(target=SSGA.execute_genetic, args=(80,fitness_fn_prim_hard_degree_limit,prueba,200,i,))
+        proceso = multiprocessing.Process(target=SSGA.execute_genetic, args=(80,fitness_fn_prim_hard_degree_limit,prueba,200,i,0.1,))
         procesos.append(proceso)
 
         proceso.start()
