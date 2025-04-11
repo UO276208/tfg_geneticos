@@ -55,7 +55,7 @@ def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pm
         best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
         best_fitness = fitness_fn(best, graph_matrix)
         rw.add_fitness(best_fitness)
-        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
+        #print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
     return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
@@ -156,12 +156,12 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 
 
 
-def execute_genetic(pop_number, fitness, graph, gen, i, mut):
+def execute_genetic(pop_number, fitness, graph, gen, i, mut, name):
     inicio = time.time()
     genetic_algorithm_stepwise(init_population(pop_number, len(graph)), fitness, graph, ngen=gen, pmut=mut)
     fin = time.time()
     rw.set_time(fin - inicio)
-    rw.write('prim_h_P80_G200-'+str(i))
+    rw.write(name+str(i))
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
@@ -194,12 +194,6 @@ matriz_adyacencia2 = [
     [4, 0, 9, 8, 2, 3, 10, 0, 6, 7],
     [8, 9, 4, 1, 10, 0, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-print(genetic_algorithm_stepwise(init_population(80,len(matriz_adyacencia2)), fitness_fn_prim_hard_degree_limit, matriz_adyacencia2,ngen=200))
-#for i in range(0,10):
-    #print(str(i) + '------------------------------------------------------------------')
-    #inicio = time.time()
-    #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba,ngen=200))
-    #fin = time.time()
-    #rw.set_time(fin - inicio)
-    #rw.write('prim_h_P80_G200-'+str(i))
+#execute_genetic(3,fitness_fn_prim_hard_degree_limit,prueba,5,1,0.05,'prim_h_P80_G200_0.05-')
+
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))

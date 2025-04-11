@@ -1,11 +1,11 @@
-from functools import reduce
+import pandas as pd
+import numpy as np
 
-
-class ResultsWriter:
-    def __init__(self):
-        self.fitnesses = []
-        self.fitnesses_factibles = []
-        self.fitnesses_no_factibles = []
+class DataLogger:
+    def __init__(self,n_gens):
+        self.fitnesses = np.zeros(n_gens, dtype=int)
+        self.fitnesses_factibles = np.zeros(n_gens, dtype=int)
+        self.fitnesses_no_factibles = np.zeros(n_gens, dtype=int)
         self.time = 0
 
     def add_fitness(self, value):
@@ -22,13 +22,7 @@ class ResultsWriter:
 
     def write_file(self, list, nombre):
         if len(list) > 0:
-            text = reduce(lambda a, b: str(a) + '\n' + str(b), list)
-            text += '\n' + str(self.time)
-            ruta = 'C:/Users/user/PycharmProjects/tfg_geneticos/SSGAs/data/'
-
-            with open(ruta+nombre, 'w') as f:
-                f.write(text)
-            list.clear()
+            print()
 
     def write(self, nombre):
         self.write_file(self.fitnesses, nombre + '_f.txt')
