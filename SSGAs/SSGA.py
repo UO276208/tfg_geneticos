@@ -161,7 +161,7 @@ def execute_genetic(pop_number, fitness, graph, gen, i, mut, name):
     genetic_algorithm_stepwise(init_population(pop_number, len(graph)), fitness, graph, ngen=gen, pmut=mut)
     fin = time.time()
     rw.set_time(fin - inicio)
-    rw.write(name+str(i))
+    rw.write(name+str(i),name)
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
