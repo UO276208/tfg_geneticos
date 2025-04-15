@@ -1,7 +1,7 @@
 from exceptions.ImpossibleTreeException import ImpossibleTreeException
 from fitness import kruskal as kr, prim
 import numpy as np
-from util import lectorTSP
+from util import lectorTSP, DataLogger
 from util import results_writer
 import time
 
@@ -19,7 +19,8 @@ k = 10
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
-rw = results_writer.ResultsWriter()
+#rw = results_writer.ResultsWriter()
+
 
 
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
@@ -48,7 +49,7 @@ def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
 #############################
 #############################
 
-def genetic_algorithm_stepwise(population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
         population = replace_worst(population, offspring, fitness_fn, graph_matrix)
@@ -157,11 +158,12 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 
 
 def execute_genetic(pop_number, fitness, graph, gen, i, mut, name):
+    rw = DataLogger.DataLogger(gen)
     inicio = time.time()
-    genetic_algorithm_stepwise(init_population(pop_number, len(graph)), fitness, graph, ngen=gen, pmut=mut)
+    genetic_algorithm_stepwise(rw, init_population(pop_number, len(graph)), fitness, graph, ngen=gen, pmut=mut)
     fin = time.time()
     rw.set_time(fin - inicio)
-    rw.write(name+str(i),name)
+    rw.write(name+str(i),name[:-1])
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))

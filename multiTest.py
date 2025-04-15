@@ -1,5 +1,7 @@
 import multiprocessing
-import os
+
+from pathlib import Path
+
 import pandas as pd
 
 from SSGAs import SSGA
@@ -24,19 +26,30 @@ def lanzar_test(num_ejecuciones, batch_size, pop_number, fitness, graph, gen, mu
     # Esperar a los procesos restantes
     for p in procesos:
         p.join()
+    unir_csvs(Path(Path(__file__).resolve().parent, 'SSGAs', 'data2', nombre[:-1]), nombre[:-1]+'.csv')
 
-def unir_csvs(output_dir, nombre_final='resultados_unificados.csv'):
-    '''
-    TODO
+def unir_csvs(output_dir, nombre_final):
+    # Listar todos los archivos CSV en la subcarpeta
+    archivos_csv = list(output_dir.glob("*.csv"))
 
-    :param output_dir:
-    :param nombre_final:
-    :return:
-    '''
-    archivos = [f for f in os.listdir(output_dir) if f.startswith("ejecucion_") and f.endswith(".csv")]
-    df_total = pd.concat([pd.read_csv(os.path.join(output_dir, f)).assign(run_id=i)
-                         for i, f in enumerate(sorted(archivos))], ignore_index=True)
-    df_total.to_csv(os.path.join(output_dir, nombre_final), index=False)
+    # Crear una lista para almacenar los DataFrames de cada archivo
+    lista_df = []
+    i = 0
+    for archivo in archivos_csv:
+        i+=1
+        df = pd.read_csv(archivo)
+        # Agrega una columna que identifique de qué archivo proviene el DataFrame
+        df['Fuente'] = i
+        lista_df.append(df)
+    # Unir todos los DataFrames en uno solo
+    df_consolidado = pd.concat(lista_df, ignore_index=True)
+
+    # Definir la ruta completa para el archivo resultante
+    ruta_resultante = output_dir / nombre_final
+
+    # Guardar el DataFrame consolidado en el archivo CSV
+    df_consolidado.to_csv(ruta_resultante, index=False)
+
 if __name__ == "__main__":
     prueba = lectorTSP.read_matrix("fri26.tsp")
 

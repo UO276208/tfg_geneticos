@@ -1,5 +1,5 @@
-import os
 from functools import reduce
+from pathlib import Path
 
 
 class ResultsWriter:
@@ -25,10 +25,10 @@ class ResultsWriter:
         if len(list) > 0:
             text = reduce(lambda a, b: str(a) + '\n' + str(b), list)
             text += '\n' + str(self.time)
-            ruta = 'C:/Users/Ines/PycharmProjects/tfg_geneticos/SSGAs/data2/'+directorio_nombre+'/'
-            os.makedirs(ruta, exist_ok=True)
+            ruta = Path(Path(__file__).resolve().parent.parent, 'SSGAs', 'data2', directorio_nombre)
+            ruta.mkdir(parents=True, exist_ok=True)
 
-            with open(ruta+nombre, 'w') as f:
+            with open(Path(ruta, nombre), 'w') as f:
                 f.write(text)
             list.clear()
 
