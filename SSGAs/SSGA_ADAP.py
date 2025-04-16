@@ -1,6 +1,6 @@
 from fitness import prim_ADAP as prim
 import numpy as np
-from util import lectorTSP
+from util import lectorTSP, DataLogger
 from util import results_writer
 import time
 
@@ -18,7 +18,6 @@ k = 8
 number_of_sons = 2
 decimals = 3
 tournament_size = 0.2
-rw = results_writer.ResultsWriter()
 
 
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
@@ -31,7 +30,7 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
 #############################
 #############################
 
-def genetic_algorithm_stepwise(partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
+def genetic_algorithm_stepwise(rw, partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     graph_prim = prim.Graph_prim(graph_matrix, k, partial_MST)
     for generation in range(int(ngen)):
         offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim)
@@ -139,9 +138,9 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
     return competitors
 
 
-def init_algorithm(pop_number, fitness, graph_matrix, ngen, partial_MST):
+def init_algorithm(rw, pop_number, fitness, graph_matrix, ngen, partial_MST):
 
-    return genetic_algorithm_stepwise(partial_MST, init_population(pop_number, len(graph_matrix)), fitness, graph_matrix, ngen=ngen)
+    return genetic_algorithm_stepwise(rw, partial_MST, init_population(pop_number, len(graph_matrix)), fitness, graph_matrix, ngen=ngen)
 # print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
 # print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
 #print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_hard_degree_limit, prueba1,ngen=90))
@@ -173,5 +172,5 @@ grafo = [[0,4,10,3,2],
          [3, 5, 2, 0 ,6],
          [2, 1, 4, 6, 0]]
 
-print(init_algorithm(80, fitness_fn_prim_hard_degree_limit, prueba, 100, prueba_sub))
+print(init_algorithm(DataLogger.DataLogger(80),80, fitness_fn_prim_hard_degree_limit, prueba, 100, prueba_sub))
 #UnionFind

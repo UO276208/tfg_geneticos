@@ -27,9 +27,6 @@ class DataLogger:
     def set_time(self, time):
         self.time = time
 
-    def test(self):
-        print(Path(Path(__file__).resolve().parent.parent, 'SSGAs', 'data2'))
-
     def write_file(self, path, data, name):
         path.mkdir(parents=True, exist_ok=True)
         df = pd.DataFrame({

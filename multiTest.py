@@ -45,10 +45,15 @@ def unir_csvs(output_dir, nombre_final):
     df_consolidado = pd.concat(lista_df, ignore_index=True)
 
     # Definir la ruta completa para el archivo resultante
-    ruta_resultante = output_dir / nombre_final
+    ruta_resultante = Path(output_dir.parent,nombre_final)
 
     # Guardar el DataFrame consolidado en el archivo CSV
     df_consolidado.to_csv(ruta_resultante, index=False)
+    #Eliminar los archivos individuales
+    for archivo in archivos_csv:
+        archivo.unlink()
+    #Eliminar el directorio donde estaban esos archivos
+    Path(output_dir).rmdir()
 
 if __name__ == "__main__":
     prueba = lectorTSP.read_matrix("fri26.tsp")
