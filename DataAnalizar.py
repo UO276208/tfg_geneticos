@@ -10,6 +10,7 @@ def crear_medias(nombre_archivo, h_limit, l_limit):
     df = pd.read_csv(ruta_archivo)
 
     df_grouped_mean = df.groupby('Generacion', as_index=False)["Fitness"].mean()
+    df_grouped_mean.to_csv(Path(ruta_subcarpeta, 'graficas', 'medias',nombre_archivo), index=False)
     crear_grafica(df_grouped_mean, nombre_archivo[:-4], h_limit, l_limit)
 
 def crear_grafica(df_mean, nombre, h_limit, l_limit):
@@ -31,4 +32,4 @@ def procesar_datos(h_limit, l_limit):
     archivos_csv = list(ruta_subcarpeta.glob("*.csv"))
     for archivo in archivos_csv:
         crear_medias(archivo.name, h_limit, l_limit)
-procesar_datos(1600, 700)
+procesar_datos(1600, 800)

@@ -58,9 +58,13 @@ def unir_csvs(output_dir, nombre_final):
 if __name__ == "__main__":
     prueba = lectorTSP.read_matrix("fri26.tsp")
 
-    lanzar_test(4, 6,30, fitness_fn_prim_hard_degree_limit, prueba, 50, 0.05,
+    lanzar_test(20, 12,80, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.05,
                               'prim_h_')
-    lanzar_test(4, 6, 30, fitness_fn_prim_hard_degree_limit, prueba, 50, 0.15,
+    lanzar_test(20, 12,80, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.1,
+                              'prim_h_')
+    lanzar_test(20, 12, 80, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.15,
                 'prim_h_')
+    lanzar_test(20, 12,80, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.2,
+                              'prim_h_')
 
     print("Todas las ejecuciones del algoritmo genético han terminado")
