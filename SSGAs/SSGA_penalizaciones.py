@@ -123,7 +123,7 @@ def mutate(x, pmut):
     if np.random.rand() >= pmut:
         return x
     i = np.random.randint(0, (len(x) - 2))
-    x[i] = 1
+    x[i] = get_number_distribution(0,0)
     return x
 
 def uniform_crossover(x, y):
@@ -192,18 +192,3 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 
     return competitors
 
-
-
-# print(genetic_algorithm_stepwise( [chromosome1, chromosome2, chromosome3, chromosome4, chromosome5, chromosome6, chromosome0], fitness_fn))
-# print(get_parents([chromosome1,chromosome2,chromosome3],fitness_fn, graph_matrix))
-#print(genetic_algorithm_stepwise(init_population(50,len(prueba1)), fitness_fn_prim_penalty, prueba1,'pruuevba',ngen=90))
-prueba = lectorTSP.read_matrix("fri26.tsp")
-for i in range(0,10):
-    print(str(i) + '------------------------------------------------------------------')
-    inicio = time.time()
-    print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_penalty, prueba,ngen=200))
-    fin = time.time()
-    rw.set_time(fin - inicio)
-    rw.write('kruskal_nh_P80_G200-'+str(i))
-#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_penalty, prueba,'prim_P80_G200',ngen=200))
-#print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_kruskal_penalty, prueba,'kruskal_P80_G200',ngen=200))

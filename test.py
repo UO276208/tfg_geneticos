@@ -1,19 +1,41 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import gaussian_kde
 
-def get_number_distribution(i,j):
-    gamma = 1.2
-    n = np.random.normal(0,1)
-    return round((1+gamma)**n, 3)
 
-array = np.fromfunction(np.vectorize(get_number_distribution), (1, 1000000), dtype=float)
+# Función generadora de valores (solo depende de gamma)
+def generar_valor(i, j, gamma):
+    # Ejemplo: distribución exponencial con media 1/gamma
+    return np.random.exponential(scale=1 / gamma)
 
-unique, counts = np.unique(array, return_counts=True)
 
-x = np.linspace(-1,1.5)                # definimos un vector con 50 elementos en (-1,1.5)
-ox = 0*x
+# Lista de valores de gamma a probar
+gammas = [0.5, 1.2, 2.0, 3.0]
 
-plt.figure()
-plt.plot(unique, counts)
+# Número de muestras por gamma
+n_muestras = 10000
 
+# Parámetros fijos i y j
+i, j = 0, 0
+
+# Crear figura
+plt.figure(figsize=(10, 6))
+
+# Dibujar cada curva
+for gamma in gammas:
+    muestras = [generar_valor(i, j, gamma) for _ in range(n_muestras)]
+
+    kde = gaussian_kde(muestras)
+    x_vals = np.linspace(min(muestras), max(muestras), 500)
+    y_vals = kde(x_vals)
+
+    plt.plot(x_vals, y_vals, label=f'gamma = {gamma}')  # Cada línea con etiqueta
+
+# Configuración final
+plt.title('Curvas de densidad estimada para distintos valores de gamma')
+plt.xlabel('Valor generado')
+plt.ylabel('Densidad estimada')
+plt.legend(title="Valores de gamma")  # Leyenda con título opcional
+plt.grid(True)
+plt.tight_layout()
 plt.show()

@@ -68,7 +68,7 @@ def mutate(x, pmut):
     if np.random.rand() >= pmut:
         return x
     i = np.random.randint(0, (len(x) - 2))
-    x[i] = 1
+    x[i] = get_number_distribution(0,0)
     return x
 
 def uniform_crossover(x, y):

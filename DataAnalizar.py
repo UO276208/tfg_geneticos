@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 ruta_subcarpeta = Path(Path(__file__).resolve().parent, 'SSGAs', 'data2')
 
+#Calcula el coste medio por generacion y lo guarda
 def crear_medias(nombre_archivo, h_limit, l_limit):
 
     ruta_archivo = Path(ruta_subcarpeta, nombre_archivo)
@@ -13,6 +14,7 @@ def crear_medias(nombre_archivo, h_limit, l_limit):
     df_grouped_mean.to_csv(Path(ruta_subcarpeta, 'graficas', 'medias',nombre_archivo), index=False)
     crear_grafica(df_grouped_mean, nombre_archivo[:-4], h_limit, l_limit)
 
+#Dibuja la grafica de convergencia y la guarda
 def crear_grafica(df_mean, nombre, h_limit, l_limit):
     plt.figure(figsize=(8, 5))
     plt.plot(df_mean["Generacion"], df_mean["Fitness"], marker="o", linestyle="-", color="steelblue", label="Fitness medio")
