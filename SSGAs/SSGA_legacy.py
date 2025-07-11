@@ -50,89 +50,90 @@ def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
 
 def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
-        offspring = generate_offspring(population, fitness_fn, pmut, graph_matrix)
-        population = replace_worst(population, offspring)
+        offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
+        population = replace_worst(population, offspring, fitness_fn, graph_matrix)
+        best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
+        best_fitness = fitness_fn(best, graph_matrix)
+        rw.add_fitness(best_fitness)
+        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
+    return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
-        best = max(population, key=lambda chromosome: chromosome[1])
-        rw.add_fitness(best[1])
-        print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best[1]))
-    return max(population, key=lambda chromosome: chromosome[1])
 
-
-def replace_worst(population, offspring):
-    ordered_population = sorted(population, key=lambda chromosome: chromosome[1], reverse=True)
+def replace_worst(population, offspring, fitness_fn, graph_matrix):
+    ordered_population = sorted(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix), reverse=True)
     for i in range(0, len(offspring)):
-        if offspring[i][1] < ordered_population[i][1]:
+        if fitness_fn(offspring[i], graph_matrix) < fitness_fn(ordered_population[i], graph_matrix):
             ordered_population[i] = offspring[i]
     return ordered_population
 
 
-def generate_offspring(population, fitness_fn, pmut, graph_matrix):
+def generate_offspring(population, fitness_fn, graph_matrix, pmut):
     offspring = []
-    x, y = tournament(population)
+    x, y = tournament(population, fitness_fn, graph_matrix)
     i = 0
     while len(offspring) < number_of_sons and i <= 10:
-        son = uniform_crossover(x, y, fitness_fn, graph_matrix)
+        son = uniform_crossover(x, y)
         i += 1
         if not (son in offspring):
             i -= 1
-            offspring.append(mutate(son, pmut, fitness_fn, graph_matrix))
+            offspring.append(mutate(son, pmut))
 
     return offspring
 
 
-def mutate(x, pmut, fitness_fn, graph_matrix):
+def mutate(x, pmut):
     if np.random.rand() >= pmut:
         return x
-    i = np.random.randint(0, (len(x[0]) - 1))
-    x[0][i] = get_number_distribution(0,0)
-    x[1] = fitness_fn(x[0], graph_matrix)
+    i = np.random.randint(0, (len(x) - 2))
+    x[i] = get_number_distribution(0,0)
     return x
 
-def uniform_crossover(x, y, fitness_fn, graph_matrix):
-    probability_vector = np.random.randint(2, size=len(x[0]))
+def uniform_crossover(x, y):
+    probability_vector = np.random.randint(2, size=len(x))
     child = []
     for i in range(0, len(probability_vector)):
         if probability_vector[i] == 0:
-            child.append(x[0][i])
+            child.append(x[i])
         elif probability_vector[i] == 1:
-            child.append(y[0][i])
-    return [child, fitness_fn(child, graph_matrix)]
+            child.append(y[i])
+    return child
 
 def get_number_distribution(i, j):
     gamma = 1.2
     n = np.random.normal(0, 1)
     return round((1 + gamma) ** n, decimals)
 
-def init_population(pop_number, graph, fitness):
-    graph_size = len(graph)
+def init_population(pop_number, graph_size):
     array = np.fromfunction(np.vectorize(get_number_distribution), (pop_number, graph_size + 1), dtype=float)
     population = []
 
     control_gene = [0] * (graph_size + 1)
     control_gene = list(map(lambda i: i + 1, control_gene))
     control_gene[len(control_gene) - 1] = 0
-    population.append((control_gene, fitness(control_gene,graph)))
+    population.append(control_gene)
 
     for gene in array:
         gene_list = gene.tolist()
         gene_list[len(gene) - 1] = np.random.randint(0, graph_size)
-        population.append([gene_list, fitness(gene_list, graph)])
+        population.append(gene_list)
     return population
 
 
-def tournament(population):
-    parents = [get_winers(population), get_winers(population)]
+def tournament(population, fitness_fn, graph_matrix):
+    parents = []
+
+    parents.append(get_winers(population, fitness_fn, graph_matrix))
+    parents.append(get_winers(population, fitness_fn, graph_matrix))
 
     return parents
 
 
-def get_winers(population):
+def get_winers(population, fitness_fn, graph_matrix):
     window_size = round(len(population) * tournament_size)
     start_point_window = np.random.randint(0, len(population) - window_size)
 
     competitors = get_competitors(population, start_point_window, window_size, 6)
-    ordered_competitors = sorted(competitors, key=lambda chromosome: chromosome[1])
+    ordered_competitors = sorted(competitors, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
     return ordered_competitors[0]
 
@@ -140,13 +141,13 @@ def get_winers(population):
 def get_competitors(population, start_point_window, window_size, number_of_competitors):
     competitors = []
     i = 0
-    attempts = 0
-    while i < number_of_competitors and attempts < 10:
+    j = 0
+    while i < number_of_competitors and j < 10:
         competitor = population[np.random.randint(start_point_window, window_size + start_point_window)]
-        attempts += 1
+        j += 1
         if not (competitor in competitors):
             i += 1
-            attempts -= 1
+            j -= 1
             competitors.append(competitor)
 
     return competitors
@@ -156,7 +157,7 @@ def get_competitors(population, start_point_window, window_size, number_of_compe
 def execute_genetic(pop_number, fitness, graph, gen, i, mut, name):
     rw = DataLogger.DataLogger(gen)
     inicio = time.time()
-    genetic_algorithm_stepwise(rw, init_population(pop_number, graph, fitness), fitness, graph, ngen=gen, pmut=mut)
+    genetic_algorithm_stepwise(rw, init_population(pop_number, len(graph)), fitness, graph, ngen=gen, pmut=mut)
     fin = time.time()
     rw.set_time(fin - inicio)
     rw.write(name+str(i),name[:-1])
@@ -192,6 +193,6 @@ matriz_adyacencia2 = [
     [4, 0, 9, 8, 2, 3, 10, 0, 6, 7],
     [8, 9, 4, 1, 10, 0, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-execute_genetic(5,fitness_fn_prim_hard_degree_limit,grafo,5,1,0.05,'prim_h_P80_G200_0.05-')
+#execute_genetic(3,fitness_fn_prim_hard_degree_limit,prueba,5,1,0.05,'prim_h_P80_G200_0.05-')
 
 #print(genetic_algorithm_stepwise(init_population(80,len(prueba)), fitness_fn_prim_hard_degree_limit, prueba, 'kruskal_h_P80_G200', ngen=200))

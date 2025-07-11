@@ -30,56 +30,57 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft, graph_prim):
 #############################
 #############################
 
-def genetic_algorithm_stepwise(rw, partial_MST, population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
-    graph_prim = prim.Graph_prim(graph_matrix, k, partial_MST)
+def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
-        offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim)
-        population = replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim)
-        best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
-        best_fitness = fitness_fn(best, graph_matrix, graph_prim)
+        offspring = generate_offspring(population, fitness_fn, graph_matrix, pmut)
+        population = replace_worst(population, offspring, fitness_fn, graph_matrix)
+        best = max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
+        best_fitness = fitness_fn(best, graph_matrix)
         rw.add_fitness(best_fitness)
         print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best_fitness))
-    return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
+    return max(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix))
 
 
-def replace_worst(population, offspring, fitness_fn, graph_matrix, graph_prim):
-    ordered_population = sorted(population, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim), reverse=True)
+def replace_worst(population, offspring):
+    ordered_population = sorted(population, key=lambda chromosome: chromosome[1], reverse=True)
     for i in range(0, len(offspring)):
-        if fitness_fn(offspring[i], graph_matrix, graph_prim) < fitness_fn(ordered_population[i], graph_matrix, graph_prim):
+        if offspring[i][1] < ordered_population[i][1]:
             ordered_population[i] = offspring[i]
     return ordered_population
 
 
-def generate_offspring(population, fitness_fn, graph_matrix, pmut, graph_prim):
+def generate_offspring(population, fitness_fn, pmut, graph_matrix):
     offspring = []
-    x, y = tournament(population, fitness_fn, graph_matrix, graph_prim)
+    x, y = tournament(population)
     i = 0
     while len(offspring) < number_of_sons and i <= 10:
-        son = uniform_crossover(x, y)
+        son = uniform_crossover(x, y, fitness_fn, graph_matrix)
         i += 1
         if not (son in offspring):
             i -= 1
-            offspring.append(mutate(son, pmut))
+            offspring.append(mutate(son, pmut, fitness_fn, graph_matrix))
 
     return offspring
 
 
-def mutate(x, pmut):
+
+def mutate(x, pmut, fitness_fn, graph_matrix):
     if np.random.rand() >= pmut:
         return x
-    i = np.random.randint(0, (len(x) - 2))
-    x[i] = get_number_distribution(0,0)
+    i = np.random.randint(0, (len(x[0]) - 1))
+    x[0][i] = get_number_distribution(0,0)
+    x[1] = fitness_fn(x[0], graph_matrix)
     return x
 
-def uniform_crossover(x, y):
-    probability_vector = np.random.randint(2, size=len(x))
+def uniform_crossover(x, y, fitness_fn, graph_matrix):
+    probability_vector = np.random.randint(2, size=len(x[0]))
     child = []
     for i in range(0, len(probability_vector)):
         if probability_vector[i] == 0:
-            child.append(x[i])
+            child.append(x[0][i])
         elif probability_vector[i] == 1:
-            child.append(y[i])
-    return child
+            child.append(y[0][i])
+    return [child, fitness_fn(child, graph_matrix)]
 
 
 def get_number_distribution(i, j):
@@ -88,37 +89,35 @@ def get_number_distribution(i, j):
     return round((1 + gamma) ** n, decimals)
 
 
-def init_population(pop_number, graph_size):
+def init_population(pop_number, graph, fitness):
+    graph_size = len(graph)
     array = np.fromfunction(np.vectorize(get_number_distribution), (pop_number, graph_size + 1), dtype=float)
     population = []
 
     control_gene = [0] * (graph_size + 1)
     control_gene = list(map(lambda i: i + 1, control_gene))
     control_gene[len(control_gene) - 1] = 0
-    population.append(control_gene)
+    population.append((control_gene, fitness(control_gene,graph)))
 
     for gene in array:
         gene_list = gene.tolist()
         gene_list[len(gene) - 1] = np.random.randint(0, graph_size)
-        population.append(gene_list)
+        population.append([gene_list, fitness(gene_list, graph)])
     return population
 
 
-def tournament(population, fitness_fn, graph_matrix, graph_prim):
-    parents = []
-
-    parents.append(get_winers(population, fitness_fn, graph_matrix, graph_prim))
-    parents.append(get_winers(population, fitness_fn, graph_matrix, graph_prim))
+def tournament(population):
+    parents = [get_winers(population), get_winers(population)]
 
     return parents
 
 
-def get_winers(population, fitness_fn, graph_matrix, graph_prim):
+def get_winers(population):
     window_size = round(len(population) * tournament_size)
     start_point_window = np.random.randint(0, len(population) - window_size)
 
     competitors = get_competitors(population, start_point_window, window_size, 6)
-    ordered_competitors = sorted(competitors, key=lambda chromosome: fitness_fn(chromosome, graph_matrix, graph_prim))
+    ordered_competitors = sorted(competitors, key=lambda chromosome: chromosome[1])
 
     return ordered_competitors[0]
 
@@ -126,13 +125,13 @@ def get_winers(population, fitness_fn, graph_matrix, graph_prim):
 def get_competitors(population, start_point_window, window_size, number_of_competitors):
     competitors = []
     i = 0
-    j = 0
-    while i < number_of_competitors and j < 10:
+    attempts = 0
+    while i < number_of_competitors and attempts < 10:
         competitor = population[np.random.randint(start_point_window, window_size + start_point_window)]
-        j += 1
+        attempts += 1
         if not (competitor in competitors):
             i += 1
-            j -= 1
+            attempts -= 1
             competitors.append(competitor)
 
     return competitors

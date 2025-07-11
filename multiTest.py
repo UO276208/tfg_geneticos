@@ -5,9 +5,8 @@ from pathlib import Path
 import pandas as pd
 
 from SSGAs import SSGA
-from SSGAs import SSGA2
 from SSGAs import SSGA_penalizaciones
-from SSGAs.SSGA import fitness_fn_prim_hard_degree_limit
+from SSGAs.SSGA_penalizaciones import fitness_fn_prim_penalty
 from util import lectorTSP
 
 def lanzar_test(SSGA_version, num_ejecuciones, batch_size, pop_number, fitness, graph, gen, mut, name):
@@ -60,7 +59,7 @@ def unir_csvs(output_dir, nombre_final):
 if __name__ == "__main__":
     prueba = lectorTSP.read_matrix("fri26.tsp")
 
-    lanzar_test(SSGA2,20, 12,100, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.03,'prim_imp_h_')
-    lanzar_test(SSGA, 20, 12, 100, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.03, 'prim_h_')
+    #lanzar_test(SSGA,20, 12,100, fitness_fn_prim_hard_degree_limit, prueba, 200, 0.03,'prim_imp_h_')
+    lanzar_test(SSGA_penalizaciones, 20, 12, 100, fitness_fn_prim_penalty, prueba, 200, 0.03, 'prim_h_pena')
 
     print("Todas las ejecuciones del algoritmo genético han terminado")
