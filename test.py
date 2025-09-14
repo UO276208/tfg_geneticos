@@ -10,7 +10,7 @@ def generar_valor(i, j, gamma):
 
 
 # Lista de valores de gamma a probar
-gammas = [0.5, 1.2, 2.0, 3.0]
+gammas = [0.5, 1.5, 2.0, 2.5, 3.0]
 
 # Número de muestras por gamma
 n_muestras = 10000
@@ -29,7 +29,10 @@ for gamma in gammas:
     x_vals = np.linspace(min(muestras), max(muestras), 500)
     y_vals = kde(x_vals)
 
-    plt.plot(x_vals, y_vals, label=f'gamma = {gamma}')  # Cada línea con etiqueta
+    # Línea más gruesa solo para gamma == 2.0
+    plt.savefig("densidad_pesos_gamma.png", dpi=400)
+    lw = 2.5 if gamma == 2.0 else 1.5  # ← línea destacad
+    plt.plot(x_vals, y_vals, label=f'gamma = {gamma}', linewidth=lw)  # Cada línea con etiqueta
 
 # Configuración final
 plt.title('Curvas de densidad estimada para distintos valores de gamma')
