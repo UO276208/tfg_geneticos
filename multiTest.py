@@ -8,7 +8,7 @@ import pandas as pd
 from SSGAs import SSGA
 from SSGAs import SSGA_penalizaciones
 from SSGAs.SSGA import fitness_fn_prim_hard_degree_limit, fitness_fn_kruskal_hard_degree_limit
-from SSGAs.SSGA_penalizaciones import fitness_fn_prim_penalty
+from SSGAs.SSGA_penalizaciones import fitness_fn_prim_penalty, fitness_fn_kruskal_penalty
 from util import lectorTSP
 
 def lanzar_test(SSGA_version, num_ejecuciones, batch_size, pop_number, fitness, graph, gen, mut, gamma_param, name):
@@ -64,69 +64,233 @@ def unir_csvs(output_dir, nombre_final):
     #Eliminar el directorio donde estaban esos archivos
     Path(output_dir).rmdir()
 
+def ejecutar_plantilla_pruebas(ssga_type, fitness, graph, name):
+    # limit gen
+    #lanzar_test(ssga_type, 30, 12, 1500, fitness, graph, 100000, 0.03, 0.3,
+                #name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 100000, 0.03, 0.3,
+    #            name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 3000, fitness, graph, 100000, 0.03, 0.3,
+    #            name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 5000, fitness, graph, 100000, 0.03, 0.3,
+    #            name+'limitgentest')
+
+    # pop
+    #lanzar_test(ssga_type, 30, 12, 200, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 500, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 1000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'namepoptest')
+    #lanzar_test(ssga_type, 30, 12, 1500, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'namepoptest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 3000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 5000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+
+    # mut
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.01, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.02, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'muttest_gamma')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.04, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.05, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.06, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.07, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.08, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.09, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.1, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.15, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.2, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.25, 0.3,
+    #            name+'muttest')
+
+    # gamma
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.0,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.1,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.2,
+    #            name+'gammatest')
+    ## lanzar_test(SSGA, 30, 12, 2000, fitness_fn_prim_hard_degree_limit, bayg29, 20000, 0.03, 0.3, 'kruskal_imp_h_bayg29') Este ya está arriba en mut
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.4,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.5,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.6,
+    #           name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.7,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.8,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.9,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.0,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.1,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.2,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.3,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.4,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.5,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.6,
+    #            name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.7,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.8,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.9,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.0,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.1,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.2,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.3,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.4,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.5,
+                name+'gammatest')
+
 if __name__ == "__main__":
     fri26 = lectorTSP.read_matrix("fri26.tsp")
     lin318 = lectorTSP.read_matrix("lin318.tsp")
     si535 = lectorTSP.read_matrix("si535.tsp")
     bayg29 = lectorTSP.read_matrix("bayg29.tsp")
 
-    #limit gen
-    lanzar_test(SSGA, 30, 12, 1500, fitness_fn_kruskal_hard_degree_limit, bayg29, 100000, 0.03, 0.3, 'kruskal_imp_h_bayg29_limitgentest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 100000, 0.03, 0.3, 'kruskal_imp_h_bayg29_limitgentest')
-    lanzar_test(SSGA, 30, 12, 3000, fitness_fn_kruskal_hard_degree_limit, bayg29, 100000, 0.03, 0.3, 'kruskal_imp_h_bayg29_limitgentest')
-    lanzar_test(SSGA, 30, 12, 5000, fitness_fn_kruskal_hard_degree_limit, bayg29, 100000, 0.03, 0.3, 'kruskal_imp_h_bayg29_limitgentest')
+    #ejecutar_plantilla_pruebas(SSGA_penalizaciones, fitness_fn_prim_penalty, bayg29, 'prim_imp_penalizaciones_bayg29_')
+    #ejecutar_plantilla_pruebas(SSGA_penalizaciones, fitness_fn_kruskal_penalty, bayg29, 'kruskal_imp_penalizaciones_bayg29_')
+    ssga_type = SSGA_penalizaciones
+    fitness = fitness_fn_kruskal_penalty
+    graph = bayg29
+    name = 'kruskal_imp_penalizaciones_bayg29_'
 
-    #pop
-    lanzar_test(SSGA, 30, 12, 200, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 500, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 1000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 1500, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 3000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
-    lanzar_test(SSGA, 30, 12, 5000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3,'kruskal_imp_h_bayg29_poptest')
+    # limit gen
+    #lanzar_test(ssga_type, 30, 12, 1500, fitness, graph, 100000, 0.03, 0.3,
+    #name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 100000, 0.03, 0.3,
+    #            name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 3000, fitness, graph, 100000, 0.03, 0.3,
+    #            name+'limitgentest')
+    #lanzar_test(ssga_type, 30, 12, 5000, fitness, graph, 100000, 0.03, 0.3,
+    #           name+'limitgentest')
 
-    #mut
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.01, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.02, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.3, 'kruskal_imp_h_bayg29_muttest_gamma')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.04, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.05, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.06, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.07, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.08, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.09, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.1, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.15, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.2, 0.3, 'kruskal_imp_h_bayg29_muttest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.25, 0.3, 'kruskal_imp_h_bayg29_muttest')
+    # pop
+    #lanzar_test(ssga_type, 30, 12, 200, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 500, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 1000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 1500, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 3000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
+    #lanzar_test(ssga_type, 30, 12, 5000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'poptest')
 
-    #gamma
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.0, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.1, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.2, 'kruskal_imp_h_bayg29_gammatest')
-    #lanzar_test(SSGA, 30, 12, 2000, fitness_fn_prim_hard_degree_limit, bayg29, 20000, 0.03, 0.3, 'kruskal_imp_h_bayg29') Este ya está arriba en mut
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.4, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.5, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.6, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.7, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.8, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 0.9, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.0, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.1, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.2, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.3, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.4, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.5, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.6, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.7, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.8, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 1.9, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.0, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.1, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.2, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.3, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.4, 'kruskal_imp_h_bayg29_gammatest')
-    lanzar_test(SSGA, 30, 12, 2000, fitness_fn_kruskal_hard_degree_limit, bayg29, 20000, 0.03, 2.5, 'kruskal_imp_h_bayg29_gammatest')
+    # mut
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.01, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.02, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.3,
+    #            name+'muttest_gamma')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.04, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.05, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.06, 0.3,
+    #            name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.07, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.08, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.09, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.1, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.15, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.2, 0.3,
+    #           name+'muttest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.25, 0.3,
+    #            name+'muttest')
+
+    # gamma
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.0,
+    #           name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.1,
+    #           name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.2,
+    #           name+'gammatest')
+    ## lanzar_test(SSGA, 30, 12, 2000, fitness_fn_prim_hard_degree_limit, bayg29, 20000, 0.03, 0.3, 'kruskal_imp_h_bayg29') Este ya está arriba en mut
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.4,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.5,
+    #           name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.6,
+    #           name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.7,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.8,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 0.9,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.0,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.1,
+    #            name+'gammatest')
+    #lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.2,
+    #            name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.3,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.4,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.5,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.6,
+                name+'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.7,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.8,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 1.9,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.0,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.1,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.2,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.3,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.4,
+                name + 'gammatest')
+    lanzar_test(ssga_type, 30, 12, 2000, fitness, graph, 20000, 0.03, 2.5,
+                name + 'gammatest')
 
 
 
