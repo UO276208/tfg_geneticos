@@ -210,4 +210,4 @@ prueba4 = [
     [1, 2, 2, 2, 0],
 ]
 
-execute_genetic(1000, fitness_fn_prim_hard_degree_limit, bayg29, 20000, 1,0.03, 'prim_imp_h_', 1.5)
+#execute_genetic(1000, fitness_fn_prim_hard_degree_limit, bayg29, 2000, 1,0.03, 'TEST', 1.5)

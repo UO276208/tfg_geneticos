@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 def analizar_datos():
-    ruta_base = Path(Path(__file__).resolve().parent, "SSGAs", "data_copia")
+    ruta_base = Path(Path(__file__).resolve().parent.parent.parent, "../../SSGAs", "data_copia")
     resumen_global = ruta_base / "resumen_global.csv"
 
     if not resumen_global.exists():

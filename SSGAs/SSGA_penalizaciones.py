@@ -14,8 +14,8 @@ prueba2 = [0,
            519, 455, 170, 0,
            434, 375, 265, 223, 0,
            200, 164, 344, 428, 273, 0]
-k = 4
-number_of_sons = 2
+k = 3
+number_of_sons = 1
 decimals = 3
 tournament_size = 0.2
 #penalty_coefficient = 0.1
@@ -29,10 +29,6 @@ def fitness_fn_prim_penalty(sample, graph_matrix_ft):
     for edge in mst:
         real_cost += graph_matrix_ft[edge[1]][edge[2]]
     return real_cost, n_violations
-    #if ajusting:
-        #return real_cost, n_violations
-    #else:
-        #return real_cost + (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 
 def fitness_fn_kruskal_penalty(sample, graph_matrix_ft):
@@ -48,7 +44,7 @@ def fitness_fn_kruskal_penalty(sample, graph_matrix_ft):
     # return real_cost + (n_violations * (real_cost*penalty_coefficient)) #Temporal, no se si es la mejor manera de aplicarlo
 
 #############################
-def ajust_penalty_coefficients(population_set, penalty_coefficient):
+def ajust_penalty_coefficients(population_set, penalty_coefficient, ending):
 
     feasibles = []
     not_feasibles = []
@@ -66,10 +62,10 @@ def ajust_penalty_coefficients(population_set, penalty_coefficient):
             penalty_coefficient = (feasible-not_feasible) / ( -not_feasible * not_feasible)
             if penalty_coefficient < 0:
                 penalty_coefficient = 0
-        #else:#Esto no se si es buena idea, en teoria si no hay individuos que no violen restricciones
-            # querría intentar que haya asi que incremento la penalizacion por cada violacion de restriccion en un 10%
-            #penalty_coefficient = penalty_coefficient * 1.1
-    return penalty_coefficient
+    if ending:
+        return penalty_coefficient*1.2
+    else:
+        return penalty_coefficient
 
 #############################
 
@@ -79,17 +75,25 @@ def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix,
     for generation in range(int(ngen)):
         #En intervalos de tamaño 5% de ngen se recalculan los coeficientes de penalizacion
         if generation % (ngen*0.05) == 0:
-            penalty_coefficient = ajust_penalty_coefficients(population_set, penalty_coefficient)
-
+            if ((generation+1)*100)/ngen >= 70:
+                penalty_coefficient = ajust_penalty_coefficients(population_set, penalty_coefficient, True)
+            else:
+                penalty_coefficient = ajust_penalty_coefficients(population_set, penalty_coefficient, False)
         offspring = generate_offspring(population, pmut, distrib_param)
         population = replace_worst(population, offspring, population_set, fitness_fn, graph_matrix, penalty_coefficient)
 
-        best = max(population, key=lambda chromosome: chromosome[1])
+        best = min(population_set, key=lambda chromosome: chromosome[1][0])
+
+        best_valido = min(
+            (chromosome for chromosome in population_set if chromosome[1][1] == 0),
+            key=lambda chromosome: chromosome[1][0],
+            default = [0 ,[-1,0]]
+        )
 
         fitness_array = np.array([chromo[1] for chromo in population])
         fitness_avg = np.mean(fitness_array)
 
-        rw.add_fitness(best[1], fitness_avg)
+        rw.add_fitness(best[1][0], fitness_avg, best[1][1], best_valido[1][0])
         print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best[1]))
     return min(population, key=lambda chromosome: chromosome[1])
 
@@ -244,4 +248,4 @@ matriz_adyacencia2 = [
     [8, 9, 4, 1, 10, 0, 9, 6, 0, 2],
     [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
 
-execute_genetic(2000,fitness_fn_prim_penalty,bayg29,20000,1,0.03,'prueba-AA', 0.3)
+execute_genetic(2000,fitness_fn_prim_penalty,bayg29,20000,1,0.03,'prueba-DD', 0.3)

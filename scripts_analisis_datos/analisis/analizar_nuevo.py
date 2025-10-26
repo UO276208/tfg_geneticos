@@ -98,9 +98,6 @@ def procesar_datos():
 
     print("✅ Archivos resumen generados.")
 
-    # --------------------------------------------------------------------
-    # 🔹 Cálculo automático del impacto medio de cada parámetro
-    # --------------------------------------------------------------------
     resultados_impacto = []
     parametros = {
         "gamma": "Gamma",
@@ -112,25 +109,55 @@ def procesar_datos():
     for (variante, experimento), grupo in df_resumen.groupby(["Variante", "Experimento"]):
         if experimento not in parametros:
             continue
+
         param = parametros[experimento]
-        df_sorted = grupo.sort_values(param)
+        df_sorted = grupo.sort_values(param).reset_index(drop=True)
 
-        # Diferencia relativa de fitness entre configuraciones consecutivas
-        df_sorted["delta_fit_pct"] = (
-            df_sorted["Fitness_medio_final_mean"].diff().abs()
-            / df_sorted["Fitness_medio_final_mean"].shift(1)
-        ) * 100
+        # ----------------------------------------------------------------
+        # 🔸 CASO 1: Parámetro gamma → usar salto configurable (0.2, 0.5, etc.)
+        # ----------------------------------------------------------------
+        if experimento == "gamma":  # <- cuidado: debe coincidir con la clave en df_resumen, no "Gamma"
+            salto_gamma = 0.2  # cambia a 0.2, 0.5, etc.
+            tolerancia = 1e-6
+            pares_validos = []
 
-        # Promedio ignorando el primer NaN
-        impacto_medio = df_sorted["delta_fit_pct"].mean()
+            # Compara todos los pares posibles (no solo consecutivos)
+            for i in range(len(df_sorted)):
+                for j in range(i + 1, len(df_sorted)):
+                    delta = abs(df_sorted.loc[j, param] - df_sorted.loc[i, param])
+                    if np.isclose(delta, salto_gamma, atol=tolerancia):
+                        pares_validos.append((i, j))
 
-        # Normalizado por el salto medio del parámetro (por si los pasos no son iguales)
-        delta_param_mean = df_sorted[param].diff().abs().mean()
-        if pd.notna(delta_param_mean) and delta_param_mean > 0:
-            impacto_normalizado = impacto_medio / delta_param_mean
+            delta_fit_pct = []
+            for i, j in pares_validos:
+                F_i = df_sorted.loc[i, "Fitness_medio_final_mean"]
+                F_j = df_sorted.loc[j, "Fitness_medio_final_mean"]
+                delta_fit_pct.append(abs((F_j - F_i) / F_i) * 100)
+
+            impacto_medio = np.mean(delta_fit_pct) if delta_fit_pct else np.nan
+            impacto_normalizado = np.nan  # no se normaliza
+
+        # ----------------------------------------------------------------
+        # 🔸 CASO 2: Resto de parámetros → saltos consecutivos (original)
+        # ----------------------------------------------------------------
         else:
-            impacto_normalizado = np.nan
+            df_sorted["delta_fit_pct"] = (
+                                                 df_sorted["Fitness_medio_final_mean"].diff().abs()
+                                                 / df_sorted["Fitness_medio_final_mean"].shift(1)
+                                         ) * 100
+            impacto_medio = df_sorted["delta_fit_pct"].mean()
 
+            # Cálculo del salto medio solo como referencia
+            delta_param_mean = df_sorted[param].diff().abs().mean()
+            impacto_normalizado = (
+                impacto_medio / delta_param_mean
+                if pd.notna(delta_param_mean) and delta_param_mean > 0
+                else np.nan
+            )
+
+        # ----------------------------------------------------------------
+        # 🔸 Guardar resultados
+        # ----------------------------------------------------------------
         resultados_impacto.append({
             "Variante": variante,
             "Parametro": param,
@@ -139,9 +166,12 @@ def procesar_datos():
             "Impacto_normalizado": impacto_normalizado
         })
 
+    # --------------------------------------------------------------------
+    # 🔹 Exportar resultados
+    # --------------------------------------------------------------------
     df_impacto = pd.DataFrame(resultados_impacto)
     df_impacto.to_csv(ruta_salida / "impacto_parametros.csv", index=False)
-    print("✅ Archivo de impacto medio generado.")
+    print("✅ Archivo de impacto medio generado (γ con salto 0.2).")
 
 # Ejecutar
 if __name__ == "__main__":
