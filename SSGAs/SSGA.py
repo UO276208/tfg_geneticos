@@ -2,7 +2,6 @@ from exceptions.ImpossibleTreeException import ImpossibleTreeException
 from fitness import kruskal as kr, prim
 import numpy as np
 from util import lectorTSP, DataLogger
-from util import results_writer
 import time
 
 prueba1 = [[0, 4, 3, 9],
@@ -19,10 +18,14 @@ k = 3
 number_of_sons = 1
 decimals = 3
 tournament_size = 0.2
-#rw = results_writer.ResultsWriter()
 
 
+"""
+Funcion de fitness que usa el algoritmo de k-prim
+:param graph_matrix_ft Matriz sobre la que se calcula el árbol
 
+:return Valor del fitness, representa el coste de la solucion
+"""
 def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
     graph = prim.Graph_prim(graph_matrix_ft, sample, k)
     real_cost = 0
@@ -33,10 +36,14 @@ def fitness_fn_prim_hard_degree_limit(sample, graph_matrix_ft):
             real_cost += graph_matrix_ft[edge[1]][edge[2]]
         return real_cost
     except ImpossibleTreeException:
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         return np.sum(graph_matrix_ft)
 
+"""
+Funcion de fitness que usa el algoritmo de k-kruskal
+:param graph_matrix_ft Matriz sobre la que se calcula el árbol
 
+:return Valor del fitness, representa el coste de la solucion
+"""
 def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
     graph = kr.Graph_kruskal(graph_matrix_ft, sample, k, input_data_type='gm')
     mst = graph.kruskal()
@@ -49,6 +56,21 @@ def fitness_fn_kruskal_hard_degree_limit(sample, graph_matrix_ft):
 #############################
 #############################
 
+"""
+Bucle principal del algoritmo genético, genera la descendencia, 
+aplica la estrategia de reemplazo y registra las métricas
+
+:param rw Datalogger para regiistro de metricas
+:param population Poblacion inicial
+:param fitness_fn Funcion de fitness
+:param graph_matrix Matriz del problema
+:param population_set Población inicial con sus fitness
+:param distrib_param Parámetro lamda
+:param ngen Número de generaciones
+:param pmut Probabilidad de mutación
+
+:return Mejor individuo
+"""
 def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix,
                                population_set, distrib_param, ngen=50, pmut=0.1):
     for generation in range(int(ngen)):
@@ -64,7 +86,16 @@ def genetic_algorithm_stepwise(rw ,population, fitness_fn, graph_matrix,
         print('Gen ' + str(generation) + ': ' + str(best) + " Fitness:" + str(best[1]))
     return min(population, key=lambda chromosome: chromosome[1])
 
+"""
+Reemplaza los peores individuos por la descendencia siempre en cuando sean de mejor calidad 
+y no existan ya en la poblacion
 
+:param population Población actual
+:param offspring Descendencia
+:param population_set Población actual con sus fitness
+
+:return Población ordenada
+"""
 def replace_worst(population, offspring, population_set):
     ordered_population = sorted(population, key=lambda chromosome: chromosome[1], reverse=True)
     for i in range(0, len(offspring)):
@@ -74,7 +105,17 @@ def replace_worst(population, offspring, population_set):
             ordered_population[i] = offspring[i]
     return ordered_population
 
+"""
+Genera la descendencia
 
+:param population Población actual
+:param fitness_fn Funcion de fitness
+:param pmut Probabilidad de mutacion
+:param graph_matrix Grafo del problema
+:param distrib_param Parámetro lamda
+
+:return Descendencia
+"""
 def generate_offspring(population, fitness_fn, pmut, graph_matrix, distrib_param):
     offspring = []
     x, y = tournament(population)
@@ -88,7 +129,17 @@ def generate_offspring(population, fitness_fn, pmut, graph_matrix, distrib_param
 
     return offspring
 
+"""
+Muta un cromosoma con una probabilidad
 
+:param x Cromosoma
+:param pmut Probabilidad de mutacion
+:param fitness_fn Funcion de fitness
+:param graph_matrix Grafo del problema
+:param distrib_param Parámetro lamda
+
+:return Cromosoma
+"""
 def mutate(x, pmut, fitness_fn, graph_matrix, distrib_param):
     if np.random.rand() >= pmut:
         return x
@@ -97,6 +148,14 @@ def mutate(x, pmut, fitness_fn, graph_matrix, distrib_param):
     x[1] = fitness_fn(x[0], graph_matrix)
     return x
 
+"""
+Cruza dos cromosomas y devuelve el resultado con su fitness calculado
+
+:param x Cromosoma
+:param y Cromosoma
+:param fitness_fn Funcion de fitness
+:param graph_matrix Grafo del problema
+"""
 def uniform_crossover(x, y, fitness_fn, graph_matrix):
     probability_vector = np.random.randint(2, size=len(x[0]))
     child = []
@@ -111,6 +170,16 @@ def get_number_distribution(i, j, gamma):
     n = np.random.normal(0, 1)
     return round((1 + gamma) ** n, decimals)
 
+"""
+Genera la poblacion inicial
+
+:param pop_number Tamaño de la poblacion
+:param graph Grafo del problema
+:param fitness Funcion de fitness
+:param distrib_param Parámetro lamda
+
+:return Poblacion inicial con fitness ya calculado
+"""
 def init_population(pop_number, graph, fitness, distrib_param):
     graph_size = len(graph)
     array = np.fromfunction(np.vectorize(lambda i, j: get_number_distribution(i, j, distrib_param)), (pop_number, graph_size + 1), dtype=float)
@@ -128,13 +197,23 @@ def init_population(pop_number, graph, fitness, distrib_param):
         population.append([gene_list, fitness(gene_list, graph)])
     return population
 
+"""
+Selecciona dos cromosomas como padres y los devuelve
 
+:param population Población actual
+:return Dos cromosomas
+"""
 def tournament(population):
     parents = [get_winers(population), get_winers(population)]
 
     return parents
 
+"""
+Aplica la seleccion por torneo
 
+:param population Población actual
+:return Individuo seleccionado
+"""
 def get_winers(population):
     window_size = round(len(population) * tournament_size)
     start_point_window = np.random.randint(0, len(population) - window_size)
@@ -144,7 +223,14 @@ def get_winers(population):
 
     return ordered_competitors[0]
 
+"""
+Selecciona y devuelve los competidores del torneo
 
+:param population Población actual
+:param start_point_window Inicio de la ventana del torneo
+:param window_size Tamaño de la ventana
+:param number_of_competitors Numero de participantes
+"""
 def get_competitors(population, start_point_window, window_size, number_of_competitors):
     competitors = []
     i = 0
@@ -170,37 +256,6 @@ def execute_genetic(pop_number, fitness, graph, gen, i, mut, name, distrib_param
     fin = time.time()
     rw.set_time(fin - inicio)
     rw.write(name+str(i),name[:-1])
-
-prueba = lectorTSP.read_matrix("fri26.tsp")
-grafo = [[0,4,10,3,2],
-         [4, 0, 1, 5, 1],
-         [10,1, 0, 2, 4],
-         [3, 5, 2, 0 ,6],
-         [2, 1, 4, 6, 0]]
-matriz_adyacencia = [
-    [0, 3, 7, 2, 5, 9, 1, 4, 8, 6],
-    [3, 0, 6, 4, 8, 2, 7, 5, 9, 1],
-    [7, 6, 0, 5, 3, 8, 2, 9, 4, 10],
-    [2, 4, 5, 0, 7, 6, 3, 8, 1, 9],
-    [5, 8, 3, 7, 0, 4, 6, 2, 10, 1],
-    [9, 2, 8, 6, 4, 0, 5, 3, 7, 10],
-    [1, 7, 2, 3, 6, 5, 0, 10, 9, 4],
-    [4, 5, 9, 8, 2, 3, 10, 0, 6, 7],
-    [8, 9, 4, 1, 10, 7, 9, 6, 0, 2],
-    [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-matriz_adyacencia2 = [
-    [0, 3, 7, 2, 5, 9, 1, 0, 8, 6],
-    [3, 0, 6, 4, 8, 2, 7, 5, 9, 1],
-    [7, 6, 0, 5, 3, 8, 2, 9, 4, 0],
-    [2, 0, 5, 0, 7, 6, 3, 8, 1, 9],
-    [5, 8, 3, 7, 0, 4, 6, 2, 10, 1],
-    [9, 2, 8, 6, 4, 0, 5, 3, 7, 10],
-    [1, 7, 2, 3, 6, 5, 0, 10, 9, 4],
-    [4, 0, 9, 8, 2, 3, 10, 0, 6, 7],
-    [8, 9, 4, 1, 10, 0, 9, 6, 0, 2],
-    [6, 1, 10, 9, 1, 10, 4, 7, 2, 0]]
-#execute_genetic(5,fitness_fn_prim_hard_degree_limit,grafo,5,1,0.05,'prim_h_P80_G200_0.05-')
-bayg29 = lectorTSP.read_matrix("bayg29.tsp")
 
 prueba4 = [
     [0, 1, 1, 1, 1],

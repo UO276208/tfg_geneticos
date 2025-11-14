@@ -10,6 +10,11 @@ class Graph_prim:
         self.input_data_type = input_data_type
         self.n_violations = 0
 
+    """
+    Sesga y guarda las aristas del grafo a partir de su matriz de adyacencia
+    
+    :return Arista sesgadas
+    """
     def get_edges(self):
         edges = []
 
@@ -21,19 +26,13 @@ class Graph_prim:
         self.edges_vault = list(edges)
         return edges
 
-    def get_edges_not_biased(self):
-        edges = []
+    """
+    Devuelve la arista más barata de las que conecta a los nodos visitados
+    :param vertexs Nodos ya visitados
+    :param edges Aristas no usadas
 
-        for i in range(0, len(self.graph_matrix)):
-            for j in range(0, len(self.graph_matrix)):
-                if i != j:
-                    if i < j:
-                        edges.append((self.graph_matrix[i][j], i, j))
-                    else:
-                        edges.append((self.graph_matrix[i][j], j, i))
-        self.edges_vault = list(edges)
-        return edges
-
+    :return Arista
+    """
     def get_cheapest_edge(self, vertexs, edges):
         vertexs_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
         vertexs_filtered.sort()
@@ -41,6 +40,14 @@ class Graph_prim:
             raise ImpossibleTreeException('No se puede completar el arbol')
         return vertexs_filtered[0]
 
+    """
+    Comprueba si una arista es válida y registra si viola la restriccion de grado
+    :param edge Arista a evaluar
+    :param visited Nodos ya visitados
+
+    :return False formaría ciclos
+            True en caso contrario
+    """
     def is_valid(self, edge, visited):
         if not self.uf.union(edge[1], edge[2]):
             return False
@@ -48,6 +55,11 @@ class Graph_prim:
             self.check_degree_limit(edge, visited)
             return True
 
+    """
+    Comprueba si se viola la restriccion de grado, en caso afirmativo incrementan n_violations
+    :param edge Arista a evaluar
+    :param visited Nodos ya visitados
+    """
     def check_degree_limit(self, edge, visited):
         degree_u = visited.get(edge[1], 0)
         degree_v = visited.get(edge[2], 0)

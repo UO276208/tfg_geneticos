@@ -9,6 +9,9 @@ class Graph_prim:
         self.edges_vault = []
         self.log = fitnessDataLogger.FitnessDataLogger(False)
 
+    """
+    Sesga y guarda las aristas del grafo a partir de su matriz de adyacencia
+    """
     def get_edges(self):
         edges = []
 
@@ -20,6 +23,13 @@ class Graph_prim:
         self.edges_vault = list(edges)
         return edges
 
+    """
+    Devuelve la arista más barata de las que conecta a los nodos visitados
+    :param vertexs Nodos ya visitados
+    :param edges Aristas no usadas
+    
+    :return Arista
+    """
     def get_cheapest_edge(self, vertexs, edges):
         edges_filtered = list(filter(lambda edge: edge[1] in vertexs or edge[2] in vertexs, edges))
         edges_filtered.sort()
@@ -31,6 +41,12 @@ class Graph_prim:
 
         return edges_filtered[0]
 
+    """
+    Comprueba si una arista es válida
+
+    :return False si añadirla violaría la restricción de grado o formaría ciclos
+            True en caso contrario
+    """
     def is_valid(self, edge, visited):
         if not self.check_degree_limit(edge, visited):
             return False
@@ -39,18 +55,17 @@ class Graph_prim:
         else:
             return True
 
+    """
+    Comprueba si una arista viola la restriccion de grado
+
+    :return False si añadirla violaría la restricción de grado
+    """
     def check_degree_limit(self, edge, visited):
         degree_u = visited.get(edge[1], 0)
         degree_v = visited.get(edge[2], 0)
         if (degree_u + 1) > self.degree_limit or (degree_v + 1) > self.degree_limit:
             return False
         return True
-
-    def get_the_other_edge(self, nodes_visited, edge):
-        if edge[1] in nodes_visited:
-            return edge[2], edge[1]
-        else:
-            return edge[1], edge[2]
 
     def prim(self):
         start_vertex = self.chromosome[len(self.chromosome) - 1]

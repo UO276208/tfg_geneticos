@@ -9,11 +9,12 @@ class Graph_kruskal:
         self.input_data_type = input_data_type
         self.n_violations = 0
 
+    """
+    Sesga y guarda las aristas del grafo a partir de su matriz de adyacencia
+    
+    :return Arista sesgadas
+    """
     def get_edges(self):
-        if self.input_data_type == 'gm':
-            return self.get_edges_gm()
-
-    def get_edges_gm(self):
         edges = []
 
         for i in range(0, len(self.graph_matrix)):
@@ -24,6 +25,14 @@ class Graph_kruskal:
         self.edges_vault = list(edges)
         return edges
 
+    """
+    Comprueba si una arista es válida y registra si viola la restriccion de grado
+    :param edge Arista a evaluar
+    :param visited Nodos ya visitados
+
+    :return False formaría ciclos
+            True en caso contrario
+    """
     def is_valid(self, edge, visited):
         if not self.uf.union(edge[1], edge[2]):
             return False
@@ -31,6 +40,11 @@ class Graph_kruskal:
             self.check_degree_limit(edge, visited)
             return True
 
+    """
+    Comprueba si se viola la restriccion de grado, en caso afirmativo incrementan n_violations
+    :param edge Arista a evaluar
+    :param visited Nodos ya visitados
+    """
     def check_degree_limit(self, edge, visited):
         degree_u = visited.get(edge[1], 0)
         degree_v = visited.get(edge[2], 0)
@@ -56,12 +70,3 @@ class Graph_kruskal:
                 nodes_visited[v] = nodes_visited.get(v, 0) + 1
 
         return MST, self.n_violations
-
-
-graph_matrix = [[0, 3, 1, 0],
-                [3, 0, 2, 4],
-                [1, 2, 0, 5],
-                [0, 4, 5, 0]]
-
-graph = Graph_kruskal(graph_matrix, [3, 4, 5, 1, 0], 2)
-print(graph.kruskal())

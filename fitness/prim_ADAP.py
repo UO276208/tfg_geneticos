@@ -10,8 +10,10 @@ class Graph_prim:
         self.nodes_visited = {}
         self.MST_to_complete = self.check_and_TRANSFORM_MST(MST_to_complete)
 
-    #Compruebo que el grafo a completar no tiene ciclos, no sobrepasa el limite de grado
-    #y si sus aristas son correctas (solo unen nodos existentes)
+    """
+    Comprueba si el subarbol es correcto, es decir, no tiene ciclos, no sobrepasa el límite de grado y solo conecta
+    nodos existentes. Y registra el grado de los nodos
+    """
     def check_and_TRANSFORM_MST(self, MST_NC):
         biggest_node = 0
         for c, u, v in MST_NC:
@@ -31,6 +33,9 @@ class Graph_prim:
                 raise Exception("El grafo a completar excede la restricción de grado o contiene ciclos")
         return MST_NC
 
+    """
+    Sesga y guarda las aristas del grafo a partir de su matriz de adyacencia
+    """
     def get_edges(self):
         edges = []
 
@@ -42,6 +47,12 @@ class Graph_prim:
         self.edges_vault = list(edges)
         return edges
 
+    """
+    Devuelve la arista más barata de las que conecta a los nodos visitados
+    :param edges Aristas no usadas
+        
+    :return Arista
+    """
     def get_cheapest_edge(self, edges):
         vertexs_filtered = list(filter(lambda edge: edge[1] in self.nodes_visited or edge[2] in self.nodes_visited, edges))
         vertexs_filtered.sort()
@@ -49,6 +60,12 @@ class Graph_prim:
             raise ImpossibleTreeException('No se puede completar el arbol')
         return vertexs_filtered[0]
 
+    """
+    Comprueba si una arista es válida
+
+    :return False si añadirla violaría la restricción de grado o formaría ciclos
+            True en caso contrario
+    """
     def is_valid(self, edge, visited):
         if not self.check_degree_limit(edge):
             return False
@@ -57,6 +74,11 @@ class Graph_prim:
         else:
             return True
 
+    """
+    Comprueba si una arista viola la restriccion de grado
+
+    :return False si añadirla violaría la restricción de grado
+    """
     def check_degree_limit(self, edge):
         degree_u = self.nodes_visited.get(edge[1], 0)
         degree_v = self.nodes_visited.get(edge[2], 0)
